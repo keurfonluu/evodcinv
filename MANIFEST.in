@@ -1,0 +1,4 @@
+include LICENSE
+include *.rst
+recursive-include evoseispy *
+recursive-include examples *
