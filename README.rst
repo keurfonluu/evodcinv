@@ -5,7 +5,7 @@ EvoDCinv
 .. figure:: examples/evodcinv.png
 
 EvoDCinv is a Python package that provides functions to calculate and invert
-dispersion curves using evolutionary algorithms
+dispersion curves using different evolutionary algorithms.
 
 :Version: 1.0.0
 :Author: Keurfon Luu
