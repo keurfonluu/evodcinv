@@ -12,15 +12,14 @@ module dispcurve
   implicit none
 
   real(kind = 8), parameter :: pi = 3.141592653589793238460d0
-  real(kind = 8), parameter :: scale = 1d-200
 
 contains
 
-  function thomson_haskell(w, k, alpha, beta, rho, d, nl, wtype) result(detT)
+  function thomson_haskell(w, k, alpha, beta, rho, d, nl, wtype) result(panel)
     integer(kind = 4), intent(in) :: nl
     real(kind = 8), intent(in) :: w, k, alpha(nl), beta(nl), rho(nl), d(nl)
     character(len = *), optional :: wtype
-    complex(kind = 8) :: detT
+    complex(kind = 8) :: panel
     integer(kind = 4) :: i
     real(kind = 8) :: c, X(5)
     real(kind = 8), dimension(nl) :: mu, gam, t
@@ -89,7 +88,7 @@ contains
       X = mu(1)*mu(1) * [ 2.0d0*t(1), -t(1)**2, 0.0d0, 0.0d0, -4.0d0 ]
 
       do i = 1, nl-1
-        X = X * scale
+        X = X
         p1 = Cb(i) * X(2) + s(i) * Sb(i) * X(3)
         p2 = Cb(i) * X(4) + s(i) * Sb(i) * X(5)
         if ( c .ne. beta(i) ) then
@@ -121,7 +120,7 @@ contains
         X(4) = eps(i) * q4
         X(5) = bp(i) * z1 + b(i) * z2
       end do
-      detT = X(2) + s(nl) * X(3) - r(nl) * ( X(4) + s(nl) * X(5) ) * scale
+      panel = X(2) + s(nl) * X(3) - r(nl) * ( X(4) + s(nl) * X(5) )
 
     ! Love-wave propagator matrix
     case("love")
@@ -137,10 +136,10 @@ contains
 
       Tl = Tli(:,:,1)
       do i = 2, nl-1
-        Tl = Tl * scale
+        Tl = Tl
         Tl = matmul(Tl, Tli(:,:,i))
       end do
-      detT = dot_product(matmul(U, Tl), V) * scale
+      panel = dot_product(matmul(U, Tl), V)
 
     case default
       print *, "Error: unkown surface wave type '" // trim(wtype) // "'"
@@ -149,12 +148,12 @@ contains
     return
   end function thomson_haskell
 
-  function fcpanel(f, c, alpha, beta, rho, d, nf, nc, nl, wtype, n_threads) result(detT)
+  function fcpanel(f, c, alpha, beta, rho, d, nf, nc, nl, wtype, n_threads) result(panel)
     integer(kind = 4), intent(in) :: nf, nc, nl
     real(kind = 8), intent(in) :: f(nf), c(nc), alpha(nl), beta(nl), rho(nl), d(nl)
     character(len = *), intent(in), optional :: wtype
     integer(kind = 4), intent(in), optional :: n_threads
-    complex(kind = 8) :: detT(nc,nf)
+    complex(kind = 8) :: panel(nc,nf)
     integer(kind = 4) :: i, j
     real(kind = 8) :: w
     character(len = 8) :: opt_wtype
@@ -168,19 +167,19 @@ contains
     do j = 1, nf
       w = 2. * pi * f(j)
       do i = 1, nc
-        detT(i,j) = thomson_haskell(w, w/c(i), alpha, beta, rho, d, nl, opt_wtype)
+        panel(i,j) = thomson_haskell(w, w/c(i), alpha, beta, rho, d, nl, opt_wtype)
       end do
     end do
     !$omp end parallel
     return
   end function fcpanel
 
-  function fkpanel(f, k, alpha, beta, rho, d, nf, nk, nl, wtype, n_threads) result(detT)
+  function fkpanel(f, k, alpha, beta, rho, d, nf, nk, nl, wtype, n_threads) result(panel)
     integer(kind = 4), intent(in) :: nf, nk, nl
     real(kind = 8), intent(in) :: f(nf), k(nk), alpha(nl), beta(nl), rho(nl), d(nl)
     character(len = *), intent(in), optional :: wtype
     integer(kind = 4), intent(in), optional :: n_threads
-    complex(kind = 8) :: detT(nk,nf)
+    complex(kind = 8) :: panel(nk,nf)
     integer(kind = 4) :: i, j
     real(kind = 8) :: w
     character(len = 8) :: opt_wtype
@@ -194,19 +193,19 @@ contains
     do j = 1, nf
       w = 2. * pi * f(j)
       do i = 1, nk
-        detT(i,j) = thomson_haskell(w, k(i), alpha, beta, rho, d, nl, opt_wtype)
+        panel(i,j) = thomson_haskell(w, k(i), alpha, beta, rho, d, nl, opt_wtype)
       end do
     end do
     !$omp end parallel
     return
   end function fkpanel
 
-  function fkpanel_feasible(f, nk, alpha, beta, rho, d, nf, nl, wtype, n_threads) result(detT)
+  function fkpanel_feasible(f, nk, alpha, beta, rho, d, nf, nl, wtype, n_threads) result(panel)
     integer(kind = 4), intent(in) :: nf, nk, nl
     real(kind = 8), intent(in) :: f(nf), alpha(nl), beta(nl), rho(nl), d(nl)
     character(len = *), intent(in), optional :: wtype
     integer(kind = 4), intent(in), optional :: n_threads
-    complex(kind = 8) :: detT(nk,nf)
+    complex(kind = 8) :: panel(nk,nf)
     integer(kind = 4) :: i, j, l
     real(kind = 8) :: Vmin, Vmax, kmin, kmax, dk, w, k(nk)
     character(len = 8) :: opt_wtype
@@ -227,7 +226,7 @@ contains
       dk = ( kmax - kmin ) / ( nk - 1. )
       k = kmin + dk * [ ( l-1., l = 1, nk ) ]
       do i = 1, nk
-        detT(i,j) = thomson_haskell(w, k(i), alpha, beta, rho, d, nl, opt_wtype)
+        panel(i,j) = thomson_haskell(w, k(i), alpha, beta, rho, d, nl, opt_wtype)
       end do
     end do
     !$omp end parallel
@@ -245,5 +244,40 @@ contains
     v = Vr * beta
     return
   end function rayleigh_velocity
+
+  function pick(panel, faxis, yaxis, modes, ny, nf, nm, n_threads) result(dcurve)
+    integer(kind = 4), intent(in) :: ny, nf, nm
+    real(kind = 8), intent(in) :: panel(ny,nf), faxis(nf), yaxis(ny)
+    integer(kind = 4), intent(in) :: modes(nm)
+    integer(kind = 4), intent(in), optional :: n_threads
+    integer(kind = 4) :: i, j, m
+    real(kind = 8) :: dcurve(nm,2,nf)
+    integer(kind = 4), dimension(:), allocatable :: idx, iy
+    real(kind = 8), dimension(:), allocatable :: tmp
+
+    if ( present(n_threads) ) call omp_set_num_threads(n_threads)
+
+    ! Initialize variables
+    dcurve = 0.d0                       ! Picked dispersion curves for each mode
+    iy = [ ( i, i = 1, ny ) ]           ! Phase velocity axis (index)
+
+    !$omp parallel default(shared) private(tmp, idx, m)
+    !$omp do schedule(runtime)
+    do i = 1, nf
+      tmp = panel(:,i) / dabs( maxval(panel(:,i)) )
+      idx = pack(iy, mask = tmp(:ny-1) * tmp(2:) .lt. 0.d0)
+      do j = 1, nm
+        m = modes(j) + 1
+        if ( size(idx) .ge. m ) then
+          dcurve(j,1,i) = ( yaxis(idx(m)) * tmp(idx(m)+1) - yaxis(idx(m)+1) * tmp(idx(m)) ) &
+                          / ( tmp(idx(m)+1) - tmp(idx(m)) )
+          dcurve(j,2,i) = faxis(i)
+        end if
+      end do
+      deallocate(tmp, idx)
+    end do
+    !$omp end parallel
+    return
+  end function pick
 
 end module dispcurve

@@ -5,8 +5,11 @@ Author: Keurfon Luu <keurfon.luu@mines-paristech.fr>
 License: MIT
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from .dispersion_curve import DispersionCurve
 from ._dispcurve import dispcurve as dc
 
 __all__ = [ "ThomsonHaskell" ]
@@ -46,8 +49,7 @@ class ThomsonHaskell:
         else:
             self._wtype = wtype
     
-    def propagate(self, f, y = None, ny = 100, domain = "fc", eps = 0.,
-                  n_threads = 1):
+    def propagate(self, f, ny = 100, domain = "fc", eps = 0., n_threads = 1):
         """
         Compute the analytical dispersion curve modes.
         
@@ -74,8 +76,6 @@ class ThomsonHaskell:
         # Check inputs
         if not isinstance(f, np.ndarray) or f.ndim != 1:
             raise ValueError("f must be a 1-D ndarray")
-        if y is not None and (not isinstance(y, np.ndarray) or y.ndim != 1):
-            raise ValueError("y must be a 1-D ndarray")
         if not isinstance(ny, int) or ny < 1:
             raise ValueError("ny must be a positive integer")
         if not isinstance(domain, str) or domain not in [ "fc", "fk" ]:
@@ -126,17 +126,12 @@ class ThomsonHaskell:
         Parameters
         ----------
         modes : list of int, default [ 0 ]
-            Modes number to pick (0 is fundamental mode).
+            Modes number to pick (0 if fundamental).
             
         Returns
         -------
-        dc : list of list
-            Picked phase velocities in m/s. The ith element of the list
-            corresponds to the dispersion curve of the ith mode.
-        faxis : list of list
-            Associated frequencies in Hz. The ith element of the list
-            corresponds to the frequencies of the dispersion curve of the
-            ith mode.
+        dcurves : list of DispersionCurve
+            Picked dispersion curves.
         """
         if not hasattr(self, "_panel"):
             raise ValueError("no propagation performed yet")
@@ -146,37 +141,58 @@ class ThomsonHaskell:
             or not np.all([ isinstance(m, int) for m in modes ]):
             raise ValueError("modes must be a list of positive integers")
         
-        modes = np.unique(modes)
-        dc = [ [] for m in modes ]
+        dcurve = [ [] for m in modes ]
         faxis = [ [] for m in modes ]
-        for f in range(len(self._faxis)):
-            tmp = self._panel[:,f] / np.max(np.abs(self._panel[:,f]))
+        for i, f in enumerate(self._faxis):
+            tmp = self._panel[:,i] / np.abs(self._panel[:,i]).max()
             idx = np.where((tmp[:-1] * tmp[1:]) < 0.)[0]
-            for i, m in enumerate(modes):
+            for j, m in enumerate(modes):
                 if len(idx) >= m+1:
                     xr = [ tmp[idx[m]], tmp[idx[m]+1] ]
                     vr = [ self._yaxis[idx[m]], self._yaxis[idx[m]+1] ]
                     x = ( vr[0] * xr[1] - vr[1] * xr[0] ) / ( xr[1] - xr[0] )
-                    dc[i].append(x)
-                    faxis[i].append(self._faxis[f])
-        return dc, faxis
+                    dcurve[j].append(x)
+                    faxis[j].append(f)
+        
+        dcurves = []
+        for i, (d, f) in enumerate(zip(dcurve, faxis)):
+            dcurves.append(DispersionCurve(d, f, int(modes[i]), self._wtype))
+            
+#        dcurve = dc.pick(self._panel, self._faxis, self._yaxis, modes, n_threads = n_threads)
+#        dcurves = []
+#        for i, df in enumerate(dcurve):
+#            d, f = df
+#            idx = np.where(d > 0.)[0]
+#            dcurves.append(DispersionCurve(d[idx], f[idx], int(modes[i]), self._wtype))
+        return dcurves
     
     def save_picks(self, filename, modes = [ 0 ]):
-        dc, faxis = self.pick(modes)
+        """
+        Export picked dispersion curves to ASCII file.
+        
+        Parameters
+        ----------
+        filename : str
+            Output file name.
+        modes : list of int
+            Modal curves to export.
+        """
+        dcurves = self.pick(modes)
         fid = open(filename, "w")
-        for m in modes:
-            if m == 0:
-                header = "# Fundamental mode\n"
-            else:
-                header = "# Mode %d\n" % m
-            fid.write(header)
-            
-            d = dc[m]
-            f = faxis[m]
-            npts = len(d)
-            for i in range(npts):
-                fid.write(str(f[i]) + " " + str(d[i]) + "\n")
-            fid.write("\n")
+        for dcurve in dcurves:
+            if dcurve.npts > 0:
+                if dcurve.mode == 0:
+                    header = "# Fundamental mode\n"
+                else:
+                    header = "# Mode %d\n" % dcurve.mode
+                fid.write(header)
+                
+                d = dcurve.phase_velocity
+                f = dcurve.faxis
+                npts = len(d)
+                for i in range(npts):
+                    fid.write(str(f[i]) + " " + str(d[i]) + "\n")
+                fid.write("\n")
         fid.close()
     
     def plot(self, n_levels = 200, axes = None, figsize = (8, 8), cmap = None,
@@ -199,11 +215,18 @@ class ThomsonHaskell:
             
         Returns
         -------
-        ax1 : matplotlib axes
-            Axes used for plot.
+        cax : matplotlib contour
+            Contour plot.
         """
         if not hasattr(self, "_panel"):
             raise ValueError("no propagation performed yet")
+        if axes is not None and not isinstance(axes, Axes):
+            raise ValueError("axes must be Axes")
+        if not isinstance(figsize, (list, tuple)) or len(figsize) != 2:
+            raise ValueError("figsize must be a tuple with 2 elements")
+        if not isinstance(cont_kws, dict):
+            raise ValueError("cont_kws must be a dictionary")
+        
         if cmap is None:
             cmap = self._set_cmap()
         if axes is None:
@@ -211,9 +234,8 @@ class ThomsonHaskell:
             fig.patch.set_alpha(0.)
             ax1 = fig.add_subplot(1, 1, 1)
         else:
-            ax1 = axes
-        
-        ax1.contourf(self._faxis, self._yaxis, np.log(np.abs(self._panel)),
+            ax1 = axes        
+        cax = ax1.contourf(self._faxis, self._yaxis, np.log(np.abs(self._panel)),
                      n_levels, cmap = cmap, **cont_kws)
         ax1.set_xlabel("Frequency (Hz)", fontsize = 12)
         if self._domain == "fc":
@@ -221,7 +243,7 @@ class ThomsonHaskell:
         elif self._domain == "fk":
             ax1.set_ylabel("Wavenumber (rad/m)", fontsize = 12)
         ax1.grid(True, linestyle = ":")
-        return ax1
+        return cax
         
     def _set_cmap(self):
         import matplotlib.cm as cm

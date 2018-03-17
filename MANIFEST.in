@@ -1,4 +1,4 @@
 include LICENSE
 include *.rst
-recursive-include evoseispy *
+recursive-include evodcinv *
 recursive-include examples *

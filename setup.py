@@ -3,19 +3,18 @@
 from setuptools import find_packages
 from numpy.distutils.core import setup, Extension
 
-VERSION = "0.0.1"
-DISTNAME = "evoseispy"
-DESCRIPTION = "EvoSeisPy"
-LONG_DESCRIPTION = """Seismology with Evolutionary Algorithm in Python"""
+VERSION = "1.0.0"
+DISTNAME = "evodcinv"
+DESCRIPTION = "EvoDCinv"
+LONG_DESCRIPTION = """Dispersion curve inversion using Evolutionary Algorithms"""
 AUTHOR = "Keurfon LUU"
 AUTHOR_EMAIL = "keurfon.luu@mines-paristech.fr"
-URL = "https://github.com/keurfonluu/evoseispy"
+URL = "https://github.com/keurfonluu/evodcinv"
 LICENSE = "MIT License"
 REQUIREMENTS = [
     "numpy",
     "matplotlib",
-    "fteikpy>=1.2.3",
-    "stochopy>=1.6.0",
+    "stochopy>=1.7.0",
 ]
 CLASSIFIERS = [
     "Programming Language :: Python",
@@ -31,12 +30,19 @@ CLASSIFIERS = [
 FFLAGS = "-O3 -ffast-math -funroll-loops -fno-protect-parens -fopenmp"
 
 ext1 = Extension(
-    name = "evoseispy.dispersion_curve._dispcurve",
-    sources = ["evoseispy/dispersion_curve/f90/dispcurve.f90"],
+    name = "evodcinv._dispcurve",
+    sources = ["evodcinv/f90/dispcurve.f90"],
     extra_f90_compile_args = FFLAGS.split(),
     extra_link_args = [ "-lgomp" ],
     )
- 
+
+ext2 = Extension(
+    name = "evodcinv._lay2vel",
+    sources = ["evodcinv/f90/lay2vel.f90"],
+    extra_f90_compile_args = FFLAGS.split(),
+    f2py_options = [],
+    )
+
 if __name__ == "__main__":
     setup(
         name = DISTNAME,
@@ -51,5 +57,5 @@ if __name__ == "__main__":
         version = VERSION,
         packages = find_packages(),
         include_package_data = True,
-        ext_modules = [ ext1 ],
+        ext_modules = [ ext1, ext2 ],
     )

@@ -1,5 +1,0 @@
-faxis		1	x	115
-kaxis		1	x	172
-fk		115	x	172
-saxis		1	x	300
-slowness	115	x	300
