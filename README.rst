@@ -102,13 +102,13 @@ by commenting out from lines 96 to 104:
 
 If you got the error:
 
-.. code-block:: bash
+.. code-block::
 
     error: f90 not supported by GnuFCompiler needed for evodcinv/f90/dispcurve.f90
 
 You may download the package and run the following command in the root directory:
 
-.. code-block:: bash
+.. code-block::
 
     python setup.py config_fc --fcompiler=gnu95 install
     
