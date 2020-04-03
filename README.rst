@@ -99,6 +99,18 @@ by commenting out from lines 96 to 104:
     #        # Define the MSVC version as hint for MinGW
     #        msvcr_version = '0x%03i0' % int(msvc_runtime_library().lstrip('msvcr'))
     #        self.define_macro('__MSVCRT_VERSION__', msvcr_version)
+
+If you got the error:
+
+.. code-block:: bash
+
+    error: f90 not supported by GnuFCompiler needed for evodcinv/f90/dispcurve.f90
+
+You may download the package and run the following command in the root directory:
+
+.. code-block:: bash
+
+    python setup.py config_fc --fcompiler=gnu95 install
     
     
 Related works
