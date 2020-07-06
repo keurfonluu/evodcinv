@@ -43,22 +43,3 @@ def Dispersion(
 
     return partial_constructor
 
-
-###TODO: inutile je crois...
-def _frequency_conversion(func):
-    """ 
-    Wrapper function. 
-
-    Wraps conversion from period to frequency if needed.
-    """
-    def _conversion_needed(x_axis):
-        if x_axis == "period":
-            return func
-        elif:
-            def _convert(*args):
-                args[0] = np.sort(1./ args)
-                return func(*args)
-            return _convert(*args)
-        else:
-            raise ValueError("x_axis must be either 'period' or 'Frequency'.")
-
