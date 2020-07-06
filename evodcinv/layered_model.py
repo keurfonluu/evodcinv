@@ -38,6 +38,8 @@ class LayeredModel:
         if model is not None and model.shape[1] != 4:
             raise ValueError("model must have 4 columns")
         self._model = model
+        self.ComputeDispersion = Dispersion(dtype, algorithm="Dunkin", dc=0.005,
+                dt=0.025)
             
     def __str__(self):
         model = "%s: %s" % ("model".rjust(13), self._print_attr("model"))
@@ -154,13 +156,14 @@ class LayeredModel:
         vel = params2lay(x)
         misfit = 0.
         count = 0
+        gd = self.ComputeDispersion(*vel.T)
+        wtype = dcurve.wtype
         for i, dcurve in enumerate(self._dcurves):
-            gd = Dispersion(vel, dcurve.wtype, dtype) #todo: wrapper de disba
-            dc_calc = gd(dcurve.faxis)
-            if dc_calc[0].npts > 0:
-                dc_obs = np.interp(dc_calc[0].period, dcurve.period,
+            dc_calc = gd(dcurve.faxis, mode=i, wave=wtype)
+            if dc_calc.npts > 0:
+                dc_obs = np.interp(dc_calc.period, dcurve.period,
                         dcurve.velocity)
-                misfit += np.sum(np.square(dc_obs - dc_calc[0].velocity))
+                misfit += np.sum(np.square(dc_obs - dc_calc.velocity))
                 count += dcurve.npts
             else:
                 misfit += np.Inf
@@ -339,5 +342,5 @@ def params2vel(x, vtype = "s", nz = 100, zmax = None):
         layz = np.stack((lay[:,0], zint)).transpose()
     else:
         raise ValueError("unknown velocity type '%s'" % vtype)
-    vel = l2vf.lay2vel1(layz, dz, nz)
+    vel = l2vf.lay2vel1(layz, dz, nz) #todo: rewrite this in python
     return vel, az
