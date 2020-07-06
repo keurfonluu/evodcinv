@@ -32,7 +32,7 @@ class LayeredModel:
         Layered velocity model.
     """
     
-    def __init__(self, model = None):
+    def __init__(self, model = None, dtype = "phase"):
         if model is not None and not isinstance(model, np.ndarray) and model.ndim != 2:
             raise ValueError("model must be a 2-D ndarray")
         if model is not None and model.shape[1] != 4:

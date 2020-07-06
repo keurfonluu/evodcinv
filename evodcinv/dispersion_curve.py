@@ -34,7 +34,7 @@ class DispersionCurve:
     wtype : {'rayleigh', 'love'}, default 'rayleigh'
         Surface wave type.
     """
-    def __init__(self, velocity, faxis, mode, wtype = "rayleigh"):
+    def __init__(self, velocity, faxis, mode, wtype = "rayleigh", dtype="phase"):
         if not isinstance(velocity, (list, np.ndarray)) or np.asanyarray(velocity).ndim != 1:
             raise ValueError("velocity must be a list of 1-D ndarray")
         if not all([ np.min(c) > 0. for c in velocity ]):
@@ -182,7 +182,7 @@ class DispersionCurve:
     
     @dtype.setter
     def dtype(self, value):
-        if value not in _DTYPE:
+        if value not in self._DTYPE:
             raise ValueError(
                     "Invalid value in dtype: {value}. Please input"  +
                     "one of the following: {DTYPE}."
