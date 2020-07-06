@@ -9,8 +9,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from stochopy import Evolutionary
 from .dispersion_curve import DispersionCurve
-from .thomson_haskell import ThomsonHaskell
 from ._lay2vel import lay2vel as l2vf
+from ._solver import Dispersion
 try:
     import cPickle as pickle
 except ImportError:
@@ -155,19 +155,16 @@ class LayeredModel:
         misfit = 0.
         count = 0
         for i, dcurve in enumerate(self._dcurves):
-            th = ThomsonHaskell(vel, dcurve.wtype)
-            th.propagate(dcurve.faxis, ny = ny, domain = "fc", n_threads = n_threads)
-            if np.any([ np.isnan(sec) for sec in th._panel.ravel() ]):
-                return np.Inf
+            gd = Dispersion(vel, dcurve.wtype, dtype) #todo: wrapper de disba
+            dc_calc = gd(dcurve.faxis)
+            if dc_calc[0].npts > 0:
+                dc_obs = np.interp(dc_calc[0].period, dcurve.period,
+                        dcurve.velocity)
+                misfit += np.sum(np.square(dc_obs - dc_calc[0].velocity))
+                count += dcurve.npts
             else:
-                dc_calc = th.pick([ dcurve.mode ])
-                if dc_calc[0].npts > 0:
-                    dc_obs = np.interp(dc_calc[0].faxis, dcurve.faxis, dcurve.phase_velocity)
-                    misfit += np.sum(np.square(dc_obs - dc_calc[0].phase_velocity))
-                    count += dcurve.npts
-                else:
-                    misfit += np.Inf
-                    break
+                misfit += np.Inf
+                break
         if count != 0:
             return np.sqrt(misfit / count)
         else:
@@ -208,55 +205,6 @@ class LayeredModel:
             density (kg/m3) and thickness (m).
         """
         return params2vel(self._model, vtype, nz, zmax)
-    
-    def panel(self, wtype = "rayleigh", nf = 200,
-              th_kws = dict(ny = 200, domain = "fc", n_threads = 1)):
-        """
-        Compute the Thomson-Haskell panel.
-        
-        Parameters
-        ----------
-        wtype : {'rayleigh', 'love'}, default 'rayleigh'
-            Surface wave type.
-        nf : int, default 200
-            Number of frequency samples.
-        th_kws : dict
-            Keyworded arguments passed to ThomsonHaskell propagate method.
-        
-        Returns
-        -------
-        th : ThomsonHaskell
-            Dispersion curve panel.
-        """
-        faxis = [ dcurve.faxis for dcurve in self._dcurves ]
-        faxis_full = np.unique(np.concatenate([ f for f in faxis ]))
-        faxis_new = np.linspace(faxis_full.min(), faxis_full.max(), nf)
-        vel = self.params2lay()
-        th = ThomsonHaskell(vel, wtype)
-        th.propagate(faxis_new, **th_kws)
-        return th
-    
-    def pick(self, modes = [ 0 ], wtype = "rayleigh", nf = 200,
-             th_kws = dict(ny = 200, domain = "fc", n_threads = 1)):
-        """
-        Parameters
-        ----------
-        modes : list of int, default [ 0 ]
-            Modes number to pick (0 if fundamental).
-        wtype : {'rayleigh', 'love'}, default 'rayleigh'
-            Surface wave type.
-        nf : int, default 200
-            Number of frequency samples.
-        th_kws : dict
-            Keyworded arguments passed to ThomsonHaskell propagate method.
-        
-        Returns
-        -------
-        picks : list of DispersionCurve
-            Picked dispersion curves.
-        """
-        th = self.panel(wtype, nf, th_kws)
-        return th.pick(modes)
     
     def save(self, filename):
         """
