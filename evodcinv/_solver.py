@@ -17,9 +17,6 @@ def Dispersion(
     ----------
     dtype: str. "phase" or "group".
         Choose between group or phase velocity dispersion curves.
-    x_axis: str. "frequency" or "period".
-        Choose between a frequency of a period as x-axis for the dispersion
-        curve.
     algorithm : str {'dunkin', 'fast-delta'}, optional, default 'dunkin'
         Algorithm to use for computation of Rayleigh-wave dispersion:
          - 'dunkin': Dunkin's matrix (adapted from surf96),

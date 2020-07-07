@@ -38,7 +38,7 @@ class LayeredModel:
         if model is not None and model.shape[1] != 4:
             raise ValueError("model must have 4 columns")
         self._model = model
-        self.ComputeDispersion = Dispersion(dtype, algorithm="Dunkin", dc=0.005,
+        self.ComputeDispersion = Dispersion(dtype, algorithm="dunkin", dc=0.005,
                 dt=0.025)
             
     def __str__(self):
@@ -156,10 +156,10 @@ class LayeredModel:
         vel = params2lay(x)
         misfit = 0.
         count = 0
+        print(vel.shape)
         gd = self.ComputeDispersion(*vel.T)
-        wtype = dcurve.wtype
         for i, dcurve in enumerate(self._dcurves):
-            dc_calc = gd(dcurve.faxis, mode=i, wave=wtype)
+            dc_calc = gd(dcurve.faxis, mode=i, wave=dcurve.wtype)
             if dc_calc.npts > 0:
                 dc_obs = np.interp(dc_calc.period, dcurve.period,
                         dcurve.velocity)
