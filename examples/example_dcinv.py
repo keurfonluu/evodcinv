@@ -40,8 +40,8 @@ if __name__ == "__main__":
     outdir = "output"               # Output directory
     
     # Inversion boundaries
-    beta = np.array([ [ 100., 1000. ], [ 500., 2000. ], [ 500., 2000. ] ])
-    thickness = np.array([ [ 100., 1000. ], [ 100., 500. ], [ 99999., 99999. ] ])
+    beta = np.array([ [ 0.1, 1.], [ 0.5, 2.], [ 0.5, 2. ] ])
+    thickness = np.array([ [ 0.1, 1. ], [ 0.1, 0.5 ], [9999., 9999.] ])
     
     # Initialize dispersion curves
     disp_param = [
@@ -71,8 +71,7 @@ if __name__ == "__main__":
     models = []
     for i in range(max_run):
         lm = LayeredModel()
-        lm.invert(dcurves, beta, thickness, ny = ny, n_threads = args.num_threads,
-                  evo_kws = evo_kws, opt_kws = opt_kws)
+        lm.invert(dcurves, beta, thickness, evo_kws = evo_kws, opt_kws = opt_kws)
         if mpi_rank == 0:
             lm.save("%s/run%d.pickle" % (outdir, i+1))
             models.append(deepcopy(lm))
