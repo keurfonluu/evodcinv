@@ -307,15 +307,15 @@ def params2lay(x):
     -------
     vel : ndarray
         Layered velocity model. Each row defines the layer parameters in
-        the following order: P-wave velocity (km/s), S-wave velocity (km/s),
-        density (kg/m3) and thickness (km).
+        the following order: thickness (km), P-wave velocity (km/s), S-wave velocity (km/s),
+        density (kg/m3).
     """
     n_layers = len(x) // 3
     beta = x[:n_layers]
     alpha = beta * x[2*n_layers:]
     rho = _nafe_drake(alpha)
     d = x[n_layers:2*n_layers]
-    vel = np.concatenate((alpha[:,None], beta[:,None], rho[:,None], d[:,None]), axis = 1)
+    vel = np.concatenate((d[:,None], alpha[:,None], beta[:,None], rho[:,None]), axis=1)
     return vel
 
 
