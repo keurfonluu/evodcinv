@@ -283,10 +283,14 @@ def _betanu2alpha(beta, nu):
 
     
 def _nafe_drake(alpha):
+    """
+    Input: P-wave velocity in km/s
+    Output: density in g/cm**3
+    """
     coeff = np.array([ 1.6612, -0.4712, 0.0671, -0.0043, 0.000106 ])
-    alpha_pow = np.array([ alpha*1e-3, (alpha* 1e-3)**2, (alpha*1e-3)**3,
-                          (alpha*1e-3)**4, (alpha*1e-3)**5 ])
-    return np.dot(coeff, alpha_pow) * 1e3
+    alpha_pow = np.array([ alpha, alpha**2, alpha**3,
+                          alpha**4, alpha**5 ])
+    return np.dot(coeff, alpha_pow)
             
             
 def params2lay(x):
