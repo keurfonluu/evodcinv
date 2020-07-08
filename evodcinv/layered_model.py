@@ -158,18 +158,11 @@ class LayeredModel:
                 print(errmsg) # exc_info=e)
                 return np.Inf
 
-            if dc_calc.npts > 0:
-                dc_obs = np.interp(dc_calc.period, dcurve.period,
-                        dcurve.velocity)
-                misfit += np.sum(np.square(dc_obs - dc_calc.velocity))
-                count += dcurve.npts
-            else:
-                misfit += np.Inf
-                break
-        if count != 0:
-            return np.sqrt(misfit / count)
-        else:
-            return np.Inf
+            dc_obs = np.interp(dc_calc.period, dcurve.period,
+                    dcurve.velocity)
+            count += dc_calc.period.shape[0]
+            misfit += np.sum((dc_obs - dc_calc.velocity)**2)
+        return np.sqrt(misfit / count)
     
     def params2lay(self):
         """
