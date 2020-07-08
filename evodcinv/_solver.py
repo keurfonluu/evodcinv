@@ -29,12 +29,12 @@ def Dispersion(
     """
 
     if dtype == "phase":
-        partial_constructor = lambda a,b,c,d: PhaseDispersion(a, b, c, d,
-                algorithm, dc) 
+        def partial_constructor(a,b,c,d):
+            return PhaseDispersion(a, b, c, d, algorithm, dc) 
 
     elif dtype == "group":
-        partial_constructor = lambda a,b,c,d: GroupDispersion(a, b, c, d,
-                algorithm, dc, dt)
+        def partial_constructor(a,b,c,d):
+            return GroupDispersion(a, b, c, d, algorithm, dc, dt)
     else:
         raise ValueError("This kind of dispersion curve is not specified")
 

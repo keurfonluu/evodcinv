@@ -38,7 +38,8 @@ class LayeredModel:
         if model is not None and model.shape[1] != 4:
             raise ValueError("model must have 4 columns")
         self._model = model
-        self.ComputeDispersion = Dispersion(dtype, algorithm="dunkin", dc=0.005,
+        self.dtype = dtype
+        self.ComputeDispersion = Dispersion(self.dtype, algorithm="dunkin", dc=0.005,
                 dt=0.025)
             
     def __str__(self):
@@ -68,7 +69,7 @@ class LayeredModel:
             else:
                 return None
     
-    def invert(self, dcurves, beta, thickness, ny = 100, dtype = "float32", n_threads = 1,
+    def invert(self, dcurves, beta, thickness, dtype = "float64",
                evo_kws = dict(popsize = 10, max_iter = 100, constrain = True),
                opt_kws = dict(solver = "cpso")):
         """
@@ -85,15 +86,11 @@ class LayeredModel:
         dcurves : list of DispersionCurve
             Dispersion curves to invert.
         beta : ndarray (beta_min, beta_max)
-            S-wave velocity boundaries in m/s.
+            S-wave velocity boundaries in km/s.
         thickness : ndarray (d_min, d_max)
-            Layer thickness boundaries in m.
-        ny : int, default 100
-            Number of samples on the Y axis.
+            Layer thickness boundaries in km.
         dtype : {'float32', 'float64'}, default 'float32'
             Models data type.
-        n_threads : int, default 1
-            Number of threads to pass to OpenMP for forward modelling.
         evo_kws : dict
             Keywords to pass to evolutionary algorithm initialization.
         opt_kws : dict
@@ -117,10 +114,6 @@ class LayeredModel:
                              % (thickness.shape[0], self._n_layers))
         if np.any(thickness[:,1] < thickness[:,0]):
             raise ValueError("elements in d_max must be greater than d_min")
-        if not isinstance(ny, int) or ny < 1:
-            raise ValueError("ny must be a positive integer")
-        if not isinstance(n_threads, int) or n_threads < 1:
-            raise ValueError("n_threads must be a positive integer")
         if not isinstance(opt_kws, dict):
             raise ValueError("opt_kws must be a dictionary")
         if not isinstance(evo_kws, dict):
@@ -138,10 +131,9 @@ class LayeredModel:
         else:
             evo_kws["snap"] = True
         
-        args = ( ny, n_threads )
         lower = np.concatenate((beta[:,0], thickness[:,0], np.full(self._n_layers, 1.51)))
         upper = np.concatenate((beta[:,1], thickness[:,1], np.full(self._n_layers, 2.19)))
-        ea = Evolutionary(self._costfunc, lower, upper, args = args, **evo_kws)
+        ea = Evolutionary(self._costfunc, lower, upper, **evo_kws)
         xopt, gfit = ea.optimize(**opt_kws)
         self._misfit = gfit
         self._model = np.array(xopt, dtype = dtype)
@@ -151,15 +143,21 @@ class LayeredModel:
         self._n_eval = ea.n_eval
         return self
     
-    def _costfunc(self, x, *args):
-        ny, n_threads = args
+    def _costfunc(self, x):
         vel = params2lay(x)
         misfit = 0.
         count = 0
         print(vel.shape)
         gd = self.ComputeDispersion(*vel.T)
         for i, dcurve in enumerate(self._dcurves):
-            dc_calc = gd(dcurve.faxis, mode=i, wave=dcurve.wtype)
+            try:
+                dc_calc = gd(dcurve.faxis, mode=i, wave=dcurve.wtype)
+            except ZeroDivisionError as e:
+                errmsg=f"Params = {vel.T}. Compute Dispersion failed."
+                ###TODO: add logging
+                print(errmsg) # exc_info=e)
+                return np.Inf
+
             if dc_calc.npts > 0:
                 dc_obs = np.interp(dc_calc.period, dcurve.period,
                         dcurve.velocity)
@@ -221,6 +219,17 @@ class LayeredModel:
         with open(filename, "wb") as f:
             pickle.dump(self, f, protocol = pickle.HIGHEST_PROTOCOL)
     
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        self.ComputeDispersion = Dispersion(self.dtype, algorithm="dunkin", dc=0.005,
+                dt=0.025)
+
+    def __getstate__(self):
+        dic = self.__dict__
+        if "ComputeDispersion" in dic.keys():
+            del dic["ComputeDispersion"]
+        return dic
+
     @property
     def model(self):
         if hasattr(self, "_model"):
@@ -294,8 +303,8 @@ def params2lay(x):
     -------
     vel : ndarray
         Layered velocity model. Each row defines the layer parameters in
-        the following order: P-wave velocity (m/s), S-wave velocity (m/s),
-        density (kg/m3) and thickness (m).
+        the following order: P-wave velocity (km/s), S-wave velocity (km/s),
+        density (kg/m3) and thickness (km).
     """
     n_layers = len(x) // 3
     beta = x[:n_layers]
@@ -313,6 +322,7 @@ def params2vel(x, vtype = "s", nz = 100, zmax = None):
     Parameters
     ----------
     x : ndarray
+            itype = dcurve.wtype
         Array of parameters.
     vtypes : {'s', 'p'}, default 's'
         Velocity model type.
