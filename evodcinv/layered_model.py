@@ -7,16 +7,21 @@ License: MIT
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
+import logging
+
 from stochopy import Evolutionary
 from .dispersion_curve import DispersionCurve
 from ._lay2vel import lay2vel as l2vf
 from ._solver import Dispersion
+from disba import DispersionError
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
     
 __all__ = [ "LayeredModel", "params2lay", "params2vel" ]
+
+logging.basicConfig(level=logging.INFO)
 
     
 class LayeredModel:
@@ -31,6 +36,8 @@ class LayeredModel:
     model : ndarray
         Layered velocity model.
     """
+
+    _costfunc_calls = 0
     
     def __init__(self, model = None, dtype = "phase"):
         if model is not None and not isinstance(model, np.ndarray) and model.ndim != 2:
@@ -56,7 +63,7 @@ class LayeredModel:
             if self._model is not None and attr == "model":
                 n_lay = len(self._model) // 3
                 model = self._model.reshape((n_lay, 3), order = "F")
-                param = "\n\t\tVP (m/s)\tVS (m/s)\tThickness (m)\n"
+                param = "\n\t\tVP (km/s)\tVS (km/s)\tThickness (km)\n"
                 for i in range(n_lay):
                     param += "\t\t%.2f\t\t%.2f\t\t%.2f\n" % (model[i,0]*model[i,2], model[i,0], model[i,1])
                 return param[:-2]
@@ -147,21 +154,24 @@ class LayeredModel:
         vel = params2lay(x)
         misfit = 0.
         count = 0
-        print(vel.shape)
         gd = self.ComputeDispersion(*vel.T)
         for i, dcurve in enumerate(self._dcurves):
             try:
                 dc_calc = gd(dcurve.faxis, mode=i, wave=dcurve.wtype)
             except ZeroDivisionError as e:
                 errmsg=f"Params = {vel.T}. Compute Dispersion failed."
-                ###TODO: add logging
-                print(errmsg) # exc_info=e)
+                logging.errror(errmsg, exc_info=e)
+                return np.Inf
+            except DispersionError:
+                logging.error(f"No root for fundamental mode at call # {self._costfunc_calls}." +
+                        f"\nParameters = {x}")
                 return np.Inf
 
             dc_obs = np.interp(dc_calc.period, dcurve.period,
                     dcurve.velocity)
             count += dc_calc.period.shape[0]
             misfit += np.sum((dc_obs - dc_calc.velocity)**2)
+
         return np.sqrt(misfit / count)
     
     def params2lay(self):
