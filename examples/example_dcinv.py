@@ -21,17 +21,26 @@ except ImportError:
     sys.path.append("../")
     from evodcinv import DispersionCurve, LayeredModel, progress
     
-logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
     # Initialize MPI
     if mpi_exist:
         mpi_comm = MPI.COMM_WORLD
         mpi_rank = mpi_comm.Get_rank()
-        logging.info("MPI exists and is initialised.")
     else:
         mpi_rank = 0
-        logging.info("MPI disabled")
+    
+    # Logging
+    log_format = logging.Formatter("%(levelname)s. %(asctime)s. Process #" + str(mpi_rank)
+            + ": %(message)s")
+    logger = logging.getLogger()
+    handler = logging.StreamHandler()
+    handler.setFormatter(log_format)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    if mpi_exist and mpi_rank == 0:
+        logger.info("MPI exists and is initialised.")
+        logger.info(f"MPI processes = {mpi_comm.Get_size()}")
         
     # Parse arguments
     parser = ArgumentParser()
@@ -61,7 +70,7 @@ if __name__ == "__main__":
         faxis, disp = np.loadtxt(filename, unpack = True)
         dc = DispersionCurve(disp, faxis, mode, wtype)
         dcurves.append(dc)
-    logging.info("Input read")
+    logger.info("Input read")
 
     # Evolutionary optimizer parameters
     evo_kws = dict(popsize = 20, max_iter = 200, constrain = True, mpi = mpi_exist)
@@ -73,11 +82,11 @@ if __name__ == "__main__":
         os.makedirs(outdir, exist_ok = True)
         progress(-1, max_run, "perc", prefix = "Inverting dispersion curves: ")
         
-    logging.info("Starting inversion")   
+    logger.info("Starting inversion")   
     models = []
     for i in range(max_run):
         lm = LayeredModel()
-        logging.info(f"Initialised model for run {i} / {max_run}")
+        logger.info(f"Initialised model for run {i} / {max_run}")
         lm.invert(dcurves, beta, thickness, evo_kws = evo_kws, opt_kws = opt_kws)
 
         if mpi_rank == 0:
