@@ -76,7 +76,7 @@ class LayeredModel:
             else:
                 return None
     
-    def invert(self, dcurves, beta, thickness, dtype = "float64",
+    def invert(self, dcurves, beta, thickness, dtype = "float32",
                evo_kws = dict(popsize = 10, max_iter = 100, constrain = True),
                opt_kws = dict(solver = "cpso")):
         """
