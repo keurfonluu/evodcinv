@@ -30,13 +30,6 @@ CLASSIFIERS = [
 FFLAGS = "-O3 -ffast-math -funroll-loops -fno-protect-parens -fopenmp"
 
 ext1 = Extension(
-    name = "evodcinv._dispcurve",
-    sources = ["evodcinv/f90/dispcurve.f90"],
-    extra_f90_compile_args = FFLAGS.split(),
-    extra_link_args = [ "-lgomp" ],
-    )
-
-ext2 = Extension(
     name = "evodcinv._lay2vel",
     sources = ["evodcinv/f90/lay2vel.f90"],
     extra_f90_compile_args = FFLAGS.split(),
@@ -57,5 +50,5 @@ if __name__ == "__main__":
         version = VERSION,
         packages = find_packages(),
         include_package_data = True,
-        ext_modules = [ ext1, ext2 ],
+        ext_modules = [ ext1 ],
     )

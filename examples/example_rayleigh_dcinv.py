@@ -59,9 +59,6 @@ if __name__ == "__main__":
     # Initialize dispersion curves
     disp_param = [
         ( "data/rayleigh_mode0.txt", "rayleigh", 0 ),
-        ( "data/rayleigh_mode1.txt", "rayleigh", 1 ),
-        ( "data/love_mode0.txt", "love", 0 ),
-        ( "data/love_mode1.txt", "love", 1 ),
         ]
     
     dcurves = []

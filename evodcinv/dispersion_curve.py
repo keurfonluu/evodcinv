@@ -16,32 +16,35 @@ __all__ = [ "DispersionCurve" ]
 class DispersionCurve:
     
     _WTYPE = [ "rayleigh", "love" ]
+    _DTYPE = [ "phase", "group" ]
     
     """
     Dispersion curve.
     
     Parameters
     ----------
-    phase_velocity : list or ndarray
-        Observed phase velocities (in m/s).
-    faxis : list or ndarray
+    velocity : list or ndarray
+        Observed velocities (in m/s).
+    faxis : ndarray
         Frequency axis (in Hz).
+    dtype: string. Accepted values: "phase" or "group".
+        Choose between phase or group velocity dispersion curve.
     mode : int
         Mode number (0 if fundamental).
     wtype : {'rayleigh', 'love'}, default 'rayleigh'
         Surface wave type.
     """
-    def __init__(self, phase_velocity, faxis, mode, wtype = "rayleigh"):
-        if not isinstance(phase_velocity, (list, np.ndarray)) or np.asanyarray(phase_velocity).ndim != 1:
-            raise ValueError("phase_velocity must be a list of 1-D ndarray")
-        if not all([ np.min(c) > 0. for c in phase_velocity ]):
+    def __init__(self, velocity, faxis, mode, wtype = "rayleigh", dtype="phase"):
+        if not isinstance(velocity, (list, np.ndarray)) or np.asanyarray(velocity).ndim != 1:
+            raise ValueError("velocity must be a list of 1-D ndarray")
+        if not all([ np.min(c) > 0. for c in velocity ]):
             raise ValueError("phase velocities must be positive")
         else:
-            self._phase_velocity = phase_velocity
-            self._npts = len(phase_velocity)
+            self._velocity = velocity
+            self._npts = len(velocity)
         if not isinstance(faxis, (list, np.ndarray)) or np.asanyarray(faxis).ndim != 1 \
             or len(faxis) != self._npts:
-            raise ValueError("phase_velocity must be a list of 1-D ndarray of length %d" % self._npts)
+            raise ValueError("velocity must be a list of 1-D ndarray of length %d" % self._npts)
         if not np.all([ np.min(f) >= 0. for f in faxis ]):
             raise ValueError("frequencies must be positive")
         else:
@@ -54,6 +57,9 @@ class DispersionCurve:
             raise ValueError("wtype must be in %s, got '%s'" % (self._WTYPE, wtype))
         else:
             self._wtype = wtype
+
+        self._period = np.sort(1. / self._faxis)
+        self.dtype = dtype
             
     def save(self, filename = None, fmt = "%.8f"):
         """
@@ -68,7 +74,7 @@ class DispersionCurve:
         """
         if filename is None:
             filename = "%s_mode%d.txt" % (self._wtype, self._mode)
-        X = np.stack((self._faxis, self._phase_velocity), axis = 1)
+        X = np.stack((self._faxis, self._velocity), axis = 1)
         np.savetxt(filename, X, fmt)
             
     def plot(self, axes = None, figsize = (8, 8), plt_kws = {}):
@@ -102,20 +108,20 @@ class DispersionCurve:
             ax1 = fig.add_subplot(1, 1, 1)
         else:
             ax1 = axes
-        lax = ax1.plot(self._faxis, self._phase_velocity, **plt_kws)
+        lax = ax1.plot(self._faxis, self._velocity, **plt_kws)
         return lax
             
     @property
-    def phase_velocity(self):
+    def velocity(self):
         """
         list or ndarray
         Observed phase velocities (in m/s).
         """
-        return self._phase_velocity
+        return self._velocity
     
-    @phase_velocity.setter
-    def phase_velocity(self, value):
-        self._phase_velocity = value
+    @velocity.setter
+    def velocity(self, value):
+        self._velocity = value
         
     @property
     def faxis(self):
@@ -128,6 +134,18 @@ class DispersionCurve:
     @faxis.setter
     def faxis(self, value):
         self._faxis = value
+
+    @property
+    def period(self):
+        """
+        list or ndarray
+        Period axis (in seconds).
+        """
+        return self._period
+    
+    @period.setter
+    def faxis(self, value):
+        self._period = value
         
     @property
     def mode(self):
@@ -152,6 +170,24 @@ class DispersionCurve:
     @wtype.setter
     def wtype(self, value):
         self._wtype = value
+
+    @property
+    def dtype(self):
+        """
+        str
+        Velocity axis type.
+        Can be either "group" or "phase"
+        """
+        return self._dtype
+    
+    @dtype.setter
+    def dtype(self, value):
+        if value not in self._DTYPE:
+            raise ValueError(
+                    "Invalid value in dtype: {value}. Please input"  +
+                    "one of the following: {DTYPE}."
+            )
+        self._dtype = value
         
     @property
     def npts(self):

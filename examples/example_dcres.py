@@ -13,10 +13,10 @@ try:
 except ImportError:
     import pickle
 try:
-    from evodcinv import LayeredModel, ThomsonHaskell, params2lay
+    from evodcinv import LayeredModel, params2lay
 except ImportError:
     sys.path.append("../")
-    from evodcinv import LayeredModel, ThomsonHaskell, params2lay
+    from evodcinv import LayeredModel, params2lay
 
 
 if __name__ == "__main__":
@@ -30,7 +30,6 @@ if __name__ == "__main__":
     wtypes = [ "rayleigh", "love" ]
     fmin, fmax, df = 0.1, 10., 0.1
     f = np.arange(fmin, fmax+df, df)
-    ny = 200                            # Number of velocity discretization points
     perc = 90                           # Maximum RMS threshold as a percentage of best fitting models
     outdir = "output"                   # Output directory
     
@@ -43,11 +42,13 @@ if __name__ == "__main__":
     models = np.hstack(all_models).transpose()
     energy = np.hstack(all_energy)
     n_models = len(models)
-    
+
     # Keep good fitting models only
     apost = np.exp(-0.5*energy**2)
     threshold = perc / 100. * apost.max()
+    print(f"Threshold = {threshold:.2f}")
     idx = np.where(apost > threshold)[0]
+    print(f"Number of valid models = {len(idx)} / {len(all_models)}")
     models = models[idx]
     energy = energy[idx]
     
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     pickle.dump(models, open("%s/models.pickle" % outdir, "wb"), protocol = pickle.HIGHEST_PROTOCOL)
     pickle.dump(energy, open("%s/energy.pickle" % outdir, "wb"), protocol = pickle.HIGHEST_PROTOCOL)
     
+    """
     # Recompute dispersion curves
     lay = np.array([ params2lay(m) for m in models ])
     
@@ -76,7 +78,8 @@ if __name__ == "__main__":
             th.propagate(f, ny = ny, domain = "fc", n_threads = args.num_threads)
             lcurves.append(th.pick(modes = modes))
         pickle.dump(lcurves, open("%s/lcurves.pickle" % outdir, "wb"), protocol = pickle.HIGHEST_PROTOCOL)
-    
+    """
+
     # Print output statistics
     print("RMS min.: %.3f" % energy.min())
     print("RMS %.1f%%: %.3f" % (perc, np.sqrt(-2.*np.log(threshold))))

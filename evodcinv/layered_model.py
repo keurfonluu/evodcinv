@@ -7,16 +7,21 @@ License: MIT
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
+import logging
+
 from stochopy import Evolutionary
 from .dispersion_curve import DispersionCurve
-from .thomson_haskell import ThomsonHaskell
 from ._lay2vel import lay2vel as l2vf
+from ._solver import Dispersion
+from disba import DispersionError
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
     
 __all__ = [ "LayeredModel", "params2lay", "params2vel" ]
+
+logging.basicConfig(level=logging.INFO)
 
     
 class LayeredModel:
@@ -31,13 +36,18 @@ class LayeredModel:
     model : ndarray
         Layered velocity model.
     """
+
+    _costfunc_calls = 0
     
-    def __init__(self, model = None):
+    def __init__(self, model = None, dtype = "phase"):
         if model is not None and not isinstance(model, np.ndarray) and model.ndim != 2:
             raise ValueError("model must be a 2-D ndarray")
         if model is not None and model.shape[1] != 4:
             raise ValueError("model must have 4 columns")
         self._model = model
+        self.dtype = dtype
+        self.ComputeDispersion = Dispersion(self.dtype, algorithm="dunkin", dc=0.005,
+                dt=0.025)
             
     def __str__(self):
         model = "%s: %s" % ("model".rjust(13), self._print_attr("model"))
@@ -53,7 +63,7 @@ class LayeredModel:
             if self._model is not None and attr == "model":
                 n_lay = len(self._model) // 3
                 model = self._model.reshape((n_lay, 3), order = "F")
-                param = "\n\t\tVP (m/s)\tVS (m/s)\tThickness (m)\n"
+                param = "\n\t\tVP (km/s)\tVS (km/s)\tThickness (km)\n"
                 for i in range(n_lay):
                     param += "\t\t%.2f\t\t%.2f\t\t%.2f\n" % (model[i,0]*model[i,2], model[i,0], model[i,1])
                 return param[:-2]
@@ -66,7 +76,7 @@ class LayeredModel:
             else:
                 return None
     
-    def invert(self, dcurves, beta, thickness, ny = 100, dtype = "float32", n_threads = 1,
+    def invert(self, dcurves, beta, thickness, dtype = "float32",
                evo_kws = dict(popsize = 10, max_iter = 100, constrain = True),
                opt_kws = dict(solver = "cpso")):
         """
@@ -83,15 +93,11 @@ class LayeredModel:
         dcurves : list of DispersionCurve
             Dispersion curves to invert.
         beta : ndarray (beta_min, beta_max)
-            S-wave velocity boundaries in m/s.
+            S-wave velocity boundaries in km/s.
         thickness : ndarray (d_min, d_max)
-            Layer thickness boundaries in m.
-        ny : int, default 100
-            Number of samples on the Y axis.
+            Layer thickness boundaries in km.
         dtype : {'float32', 'float64'}, default 'float32'
             Models data type.
-        n_threads : int, default 1
-            Number of threads to pass to OpenMP for forward modelling.
         evo_kws : dict
             Keywords to pass to evolutionary algorithm initialization.
         opt_kws : dict
@@ -115,10 +121,6 @@ class LayeredModel:
                              % (thickness.shape[0], self._n_layers))
         if np.any(thickness[:,1] < thickness[:,0]):
             raise ValueError("elements in d_max must be greater than d_min")
-        if not isinstance(ny, int) or ny < 1:
-            raise ValueError("ny must be a positive integer")
-        if not isinstance(n_threads, int) or n_threads < 1:
-            raise ValueError("n_threads must be a positive integer")
         if not isinstance(opt_kws, dict):
             raise ValueError("opt_kws must be a dictionary")
         if not isinstance(evo_kws, dict):
@@ -136,10 +138,9 @@ class LayeredModel:
         else:
             evo_kws["snap"] = True
         
-        args = ( ny, n_threads )
         lower = np.concatenate((beta[:,0], thickness[:,0], np.full(self._n_layers, 1.51)))
         upper = np.concatenate((beta[:,1], thickness[:,1], np.full(self._n_layers, 2.19)))
-        ea = Evolutionary(self._costfunc, lower, upper, args = args, **evo_kws)
+        ea = Evolutionary(self._costfunc, lower, upper, **evo_kws)
         xopt, gfit = ea.optimize(**opt_kws)
         self._misfit = gfit
         self._model = np.array(xopt, dtype = dtype)
@@ -149,29 +150,29 @@ class LayeredModel:
         self._n_eval = ea.n_eval
         return self
     
-    def _costfunc(self, x, *args):
-        ny, n_threads = args
+    def _costfunc(self, x):
         vel = params2lay(x)
         misfit = 0.
         count = 0
+        gd = self.ComputeDispersion(*vel.T)
         for i, dcurve in enumerate(self._dcurves):
-            th = ThomsonHaskell(vel, dcurve.wtype)
-            th.propagate(dcurve.faxis, ny = ny, domain = "fc", n_threads = n_threads)
-            if np.any([ np.isnan(sec) for sec in th._panel.ravel() ]):
+            try:
+                dc_calc = gd(dcurve.faxis, mode=i, wave=dcurve.wtype)
+            except ZeroDivisionError as e:
+                errmsg=f"Params = {vel.T}. Compute Dispersion failed."
+                logging.errror(errmsg, exc_info=e)
                 return np.Inf
-            else:
-                dc_calc = th.pick([ dcurve.mode ])
-                if dc_calc[0].npts > 0:
-                    dc_obs = np.interp(dc_calc[0].faxis, dcurve.faxis, dcurve.phase_velocity)
-                    misfit += np.sum(np.square(dc_obs - dc_calc[0].phase_velocity))
-                    count += dcurve.npts
-                else:
-                    misfit += np.Inf
-                    break
-        if count != 0:
-            return np.sqrt(misfit / count)
-        else:
-            return np.Inf
+            except DispersionError:
+                logging.error(f"No root for fundamental mode at call # {self._costfunc_calls}." +
+                        f"\nParameters = {x}")
+                return np.Inf
+
+            dc_obs = np.interp(dc_calc.period, dcurve.period,
+                    dcurve.velocity)
+            count += dc_calc.period.shape[0]
+            misfit += np.sum((dc_obs - dc_calc.velocity)**2)
+
+        return np.sqrt(misfit / count)
     
     def params2lay(self):
         """
@@ -209,55 +210,6 @@ class LayeredModel:
         """
         return params2vel(self._model, vtype, nz, zmax)
     
-    def panel(self, wtype = "rayleigh", nf = 200,
-              th_kws = dict(ny = 200, domain = "fc", n_threads = 1)):
-        """
-        Compute the Thomson-Haskell panel.
-        
-        Parameters
-        ----------
-        wtype : {'rayleigh', 'love'}, default 'rayleigh'
-            Surface wave type.
-        nf : int, default 200
-            Number of frequency samples.
-        th_kws : dict
-            Keyworded arguments passed to ThomsonHaskell propagate method.
-        
-        Returns
-        -------
-        th : ThomsonHaskell
-            Dispersion curve panel.
-        """
-        faxis = [ dcurve.faxis for dcurve in self._dcurves ]
-        faxis_full = np.unique(np.concatenate([ f for f in faxis ]))
-        faxis_new = np.linspace(faxis_full.min(), faxis_full.max(), nf)
-        vel = self.params2lay()
-        th = ThomsonHaskell(vel, wtype)
-        th.propagate(faxis_new, **th_kws)
-        return th
-    
-    def pick(self, modes = [ 0 ], wtype = "rayleigh", nf = 200,
-             th_kws = dict(ny = 200, domain = "fc", n_threads = 1)):
-        """
-        Parameters
-        ----------
-        modes : list of int, default [ 0 ]
-            Modes number to pick (0 if fundamental).
-        wtype : {'rayleigh', 'love'}, default 'rayleigh'
-            Surface wave type.
-        nf : int, default 200
-            Number of frequency samples.
-        th_kws : dict
-            Keyworded arguments passed to ThomsonHaskell propagate method.
-        
-        Returns
-        -------
-        picks : list of DispersionCurve
-            Picked dispersion curves.
-        """
-        th = self.panel(wtype, nf, th_kws)
-        return th.pick(modes)
-    
     def save(self, filename):
         """
         Pickle the dispersion curve to a file.
@@ -270,6 +222,17 @@ class LayeredModel:
         with open(filename, "wb") as f:
             pickle.dump(self, f, protocol = pickle.HIGHEST_PROTOCOL)
     
+    def __setstate__(self, dic):
+        self.__dict__ = dic
+        self.ComputeDispersion = Dispersion(self.dtype, algorithm="dunkin", dc=0.005,
+                dt=0.025)
+
+    def __getstate__(self):
+        dic = self.__dict__
+        if "ComputeDispersion" in dic.keys():
+            del dic["ComputeDispersion"]
+        return dic
+
     @property
     def model(self):
         if hasattr(self, "_model"):
@@ -323,10 +286,14 @@ def _betanu2alpha(beta, nu):
 
     
 def _nafe_drake(alpha):
+    """
+    Input: P-wave velocity in km/s
+    Output: density in g/cm**3
+    """
     coeff = np.array([ 1.6612, -0.4712, 0.0671, -0.0043, 0.000106 ])
-    alpha_pow = np.array([ alpha*1e-3, (alpha* 1e-3)**2, (alpha*1e-3)**3,
-                          (alpha*1e-3)**4, (alpha*1e-3)**5 ])
-    return np.dot(coeff, alpha_pow) * 1e3
+    alpha_pow = np.array([ alpha, alpha**2, alpha**3,
+                          alpha**4, alpha**5 ])
+    return np.dot(coeff, alpha_pow)
             
             
 def params2lay(x):
@@ -343,15 +310,15 @@ def params2lay(x):
     -------
     vel : ndarray
         Layered velocity model. Each row defines the layer parameters in
-        the following order: P-wave velocity (m/s), S-wave velocity (m/s),
-        density (kg/m3) and thickness (m).
+        the following order: thickness (km), P-wave velocity (km/s), S-wave velocity (km/s),
+        density (kg/m3).
     """
     n_layers = len(x) // 3
     beta = x[:n_layers]
     alpha = beta * x[2*n_layers:]
     rho = _nafe_drake(alpha)
     d = x[n_layers:2*n_layers]
-    vel = np.concatenate((alpha[:,None], beta[:,None], rho[:,None], d[:,None]), axis = 1)
+    vel = np.concatenate((d[:,None], alpha[:,None], beta[:,None], rho[:,None]), axis=1)
     return vel
 
 
@@ -362,6 +329,7 @@ def params2vel(x, vtype = "s", nz = 100, zmax = None):
     Parameters
     ----------
     x : ndarray
+            itype = dcurve.wtype
         Array of parameters.
     vtypes : {'s', 'p'}, default 's'
         Velocity model type.
@@ -391,5 +359,5 @@ def params2vel(x, vtype = "s", nz = 100, zmax = None):
         layz = np.stack((lay[:,0], zint)).transpose()
     else:
         raise ValueError("unknown velocity type '%s'" % vtype)
-    vel = l2vf.lay2vel1(layz, dz, nz)
+    vel = l2vf.lay2vel1(layz, dz, nz) #todo: rewrite this in python
     return vel, az
