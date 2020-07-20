@@ -2,6 +2,8 @@
 EvoDCinv
 ********
 
+**WARNING**: forward modeling code has been moved to a seperate package (see `disba <https://github.com/keurfonluu/disba>`__). The API is being reworked and is going to change in the next version.
+
 .. figure:: examples/evodcinv.png
 
 EvoDCinv is a Python package that provides functions to calculate and invert
