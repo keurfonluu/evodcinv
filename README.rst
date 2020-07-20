@@ -2,7 +2,7 @@
 EvoDCinv
 ********
 
-**WARNING**: forward modeling code has been moved to a seperate package (see `disba <https://github.com/keurfonluu/disba>`__). The API is being reworked and is going to change in the next version.
+**WARNING**: forward modeling code has been moved to a seperate package (see `disba <https://github.com/keurfonluu/disba>`__). The API is being reworked and is going to change in the next version. This branch is currently unstable, please install ``evodcinv`` from PyPI.
 
 .. figure:: examples/evodcinv.png
 
