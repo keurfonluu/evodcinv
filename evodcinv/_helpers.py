@@ -1,12 +1,14 @@
 import numpy
 
+from ._io import write
+
 
 nafe_drake_poly = numpy.poly1d([0.000106, -0.0043, 0.0671, -0.4721, 1.6612, 0.0])
 
 
 class InversionSummary(dict):
-    def write(self, indent=4):
-        pass
+    def write(self, filename, indent=None):
+        write(filename, self, indent)
 
     def __getattr__(self, name):
         """Define dict.attr as an alias of dict[attr]."""
