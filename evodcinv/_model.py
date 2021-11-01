@@ -8,7 +8,8 @@ from disba._common import ifunc
 from stochopy.optimize import minimize
 
 from ._common import itype
-from ._helpers import InversionSummary, get_velocity_p, nafe_drake
+from ._helpers import get_velocity_p, nafe_drake
+from ._result import InversionResult
 
 
 Layer = namedtuple("Layer", ["thickness", "velocity_s", "poisson"])
@@ -88,7 +89,7 @@ class EarthModel:
             for j in range(popsize):
                 velocity_models[i, j] = numpy.transpose(self._parse_parameters(x.xall[i, j]))
 
-        out = InversionSummary(
+        out = InversionResult(
             misfit=x.fun,
             x=x.x,
             model=numpy.transpose(self._parse_parameters(x.x)),

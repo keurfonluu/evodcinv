@@ -2,22 +2,22 @@ import json
 
 import numpy
 
-from ._helpers import InversionSummary
+from ._result import InversionResult
 
 
 def read(filename):
     with open(filename, "r") as f:
-        summary = json.load(f)
+        result = json.load(f)
 
-    summary = {
+    result = {
         k: v if numpy.ndim(v) == 0 else numpy.array(v)
-        for k, v in summary.items()
+        for k, v in result.items()
     }
 
-    return InversionSummary(**summary)
+    return InversionResult(**result)
 
 
-def write(filename, summary, indent=None):
+def write(filename, result, indent=None):
     from copy import deepcopy
 
     def jsonify(x):
@@ -34,6 +34,6 @@ def write(filename, summary, indent=None):
             return x
 
     with open(filename, "w") as f:
-        summary = deepcopy(summary)
-        summary = jsonify(summary)
-        json.dump(summary, f, indent=indent)
+        result = deepcopy(result)
+        result = jsonify(result)
+        json.dump(result, f, indent=indent)
