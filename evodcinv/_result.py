@@ -5,7 +5,7 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 from matplotlib.ticker import ScalarFormatter
 
-from disba import surf96
+from disba import surf96, depthplot
 from disba._common import ifunc
 
 from ._common import itype, units
@@ -154,6 +154,79 @@ class InversionResult(dict):
         # Disable exponential tick labels
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
+
+    def plot_model(
+        self,
+        parameter,
+        zmax=None,
+        all=False,
+        perc=0.99,
+        plot_args=None,
+        ax=None
+    ):
+        parameters = {
+            "velocity_p": 1,
+            "velocity_s": 2,
+            "density": 3,
+            "vp": 1,
+            "vs": 2,
+            "rho": 3,
+        }
+        assert parameter in parameters
+
+        # Plot arguments
+        plot_args = plot_args if plot_args is not None else {}
+        _plot_args = {
+            "cmap": "viridis_r",
+            "color": "black",
+            "linewidth": 2,
+        }
+        _plot_args.update(plot_args)
+
+        cmap = _plot_args.pop("cmap")
+
+        # Plot
+        plot = getattr(plt if ax is None else ax, "plot")
+        i = parameters[parameter]
+
+        if all:
+            # Filter and sort models
+            models, misfits = self._filter_results(perc)
+            idx = numpy.argsort(misfits)[::-1]
+            models = models[idx]
+            misfits = misfits[idx]
+
+            # Make colormap
+            norm = Normalize(misfits.min(), misfits.max())
+            smap = ScalarMappable(norm, cmap)
+            smap.set_array([])
+
+            # Generate and plot curves
+            for model, misfit in zip(models, misfits):
+                tmp = {k: v for k, v in _plot_args.items()}
+                tmp["color"] = smap.to_rgba(misfit)
+                depthplot(model[:, 0], model[:, i], zmax, plot_args=tmp, ax=ax)
+
+        else:
+            model = self.model
+            depthplot(model[:, 0], model[:, i], zmax, plot_args=_plot_args, ax=ax)
+
+        # Customize axes
+        gca = ax if ax is not None else plt.gca()
+
+        labels = {
+            "velocity_p": "P-wave velocity [km/s]",
+            "velocity_s": "S-wave velocity [km/s]",
+            "density": "Density [$g/cm^3$]",
+            "vp": "$V_p$ [km/s]",
+            "vs": "$V_s$ [km/s]",
+            "rho": "$\\rho$ [$g/cm^3$]",
+        }
+
+        xlabel = labels[parameter]
+        ylabel = "Depth [km]"
+        gca.set_xlabel(xlabel)
+        gca.set_ylabel(ylabel)
 
     def plot_misfit(self, plot_args=None, ax=None):
         # Plot arguments
