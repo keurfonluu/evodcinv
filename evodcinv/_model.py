@@ -3,6 +3,7 @@ from collections import namedtuple
 import numpy
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
+from disba._helpers import is_sorted
 from stochopy.optimize import minimize
 
 from ._common import itype
@@ -44,6 +45,7 @@ class EarthModel:
         assert mode >= 0
         assert wave in {"rayleigh", "love"}
         assert type in {"phase", "group", "ellipticity"}
+        assert is_sorted(period)
 
         self._curves.append(
             Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight)
