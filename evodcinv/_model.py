@@ -126,6 +126,7 @@ class EarthModel:
                         itype[curve.type],
                         ifunc[self._algorithm][curve.wave],
                         self._dc,
+                        self._dt,
                     )
                     idx = c > 0.0
                     dcalc = c[idx]
