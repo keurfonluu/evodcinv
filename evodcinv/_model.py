@@ -26,11 +26,7 @@ constraints = {
 
 
 class EarthModel:
-    def __init__(self, algorithm="dunkin", dc=0.005, dt=0.025):
-        self._algorithm = algorithm
-        self._dc = dc
-        self._dt = dt
-
+    def __init__(self):
         self._layers = []
         self._curves = []
         self._density_func = nafe_drake
@@ -57,32 +53,34 @@ class EarthModel:
     def set_density_func(self, func):
         self._density_func = func
 
-    def invert(self, method="cpso", options=None):
-        options = options if options is not None else {}
-
-        # Default options
-        _options = {
+    def invert(self, algorithm="dunkin", dc=0.001, dt=0.01, optimizer_args=None):
+        # Optimizer arguments
+        optimizer_args = optimizer_args if optimizer_args is not None else {}
+        _optimizer_args = {
+            "method": "cpso",
             "maxiter": 100,
             "popsize": 10,
         }
-        _options.update(options)
+        _optimizer_args.update(optimizer_args)
+
+        method = _optimizer_args.pop("method")
 
         # Overwrite options
-        _options["return_all"] = True
-        _options["constraints"] = constraints[method]
+        _optimizer_args["return_all"] = True
+        _optimizer_args["constraints"] = constraints[method]
 
         # Minimize misfit function
-        func = self._misfit_function
+        func = lambda x: self._misfit_function(x, algorithm, dc, dt)
         bounds = numpy.vstack([
             [layer.thickness for layer in self._layers],
             [layer.velocity_s for layer in self._layers],
             [layer.poisson for layer in self._layers],
         ])
-        x = minimize(func, bounds, method=method, options=_options)
+        x = minimize(func, bounds, method=method, options=_optimizer_args)
 
         # Parse output
-        maxiter = _options["maxiter"]
-        popsize = _options["popsize"]
+        maxiter = _optimizer_args["maxiter"]
+        popsize = _optimizer_args["popsize"]
 
         velocity_models = numpy.empty((maxiter, popsize, self.n_layers, 4))
         for i in range(maxiter):
@@ -109,7 +107,7 @@ class EarthModel:
 
         return thickness, velocity_p, velocity_s, density
 
-    def _misfit_function(self, x):
+    def _misfit_function(self, x, algorithm, dc, dt):
         thickness, velocity_p, velocity_s, density = self._parse_parameters(x)
 
         error = 0.0
@@ -124,9 +122,9 @@ class EarthModel:
                         density,
                         curve.mode,
                         itype[curve.type],
-                        ifunc[self._algorithm][curve.wave],
-                        self._dc,
-                        self._dt,
+                        ifunc[algorithm][curve.wave],
+                        dc,
+                        dt,
                     )
                     idx = c > 0.0
                     dcalc = c[idx]

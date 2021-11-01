@@ -64,11 +64,13 @@ class InversionResult(dict):
         mode,
         wave,
         type,
-        all=False,
+        show="best",
         disba_args=None,
         plot_args=None,
         ax=None,
     ):
+        assert show in {"best", "all"}
+
         # disba arguments
         disba_args = disba_args if disba_args is not None else {}
         _disba_args = {
@@ -119,7 +121,7 @@ class InversionResult(dict):
         plot = getattr(plt if ax is None else ax, plot_type)
         x = 1.0 / t if xaxis == "frequency" else t
 
-        if all:
+        if show == "all":
             # Sort models
             idx = numpy.argsort(self.misfits)[::-1]
             models = self.models[idx]
@@ -135,7 +137,7 @@ class InversionResult(dict):
             for curve, misfit in zip(curves, misfits):
                 plot(x, curve, color=smap.to_rgba(misfit), **_plot_args)
 
-        else:
+        elif show == "best":
             c = getc(*self.model.T)
             plot(x, c, **_plot_args)
 
@@ -157,7 +159,7 @@ class InversionResult(dict):
         self,
         parameter,
         zmax=None,
-        all=False,
+        show="best",
         plot_args=None,
         ax=None
     ):
@@ -170,6 +172,7 @@ class InversionResult(dict):
             "rho": 3,
         }
         assert parameter in parameters
+        assert show in {"best", "all"}
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
@@ -186,7 +189,7 @@ class InversionResult(dict):
         plot = getattr(plt if ax is None else ax, "plot")
         i = parameters[parameter]
 
-        if all:
+        if show == "all":
             # Sort models
             idx = numpy.argsort(self.misfits)[::-1]
             models = self.models[idx]
@@ -203,7 +206,7 @@ class InversionResult(dict):
                 tmp["color"] = smap.to_rgba(misfit)
                 depthplot(model[:, 0], model[:, i], zmax, plot_args=tmp, ax=ax)
 
-        else:
+        elif show == "best":
             model = self.model
             depthplot(model[:, 0], model[:, i], zmax, plot_args=_plot_args, ax=ax)
 
