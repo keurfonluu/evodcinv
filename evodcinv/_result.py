@@ -65,7 +65,6 @@ class InversionResult(dict):
         wave,
         type,
         all=False,
-        perc=0.99,
         disba_args=None,
         plot_args=None,
         ax=None,
@@ -121,11 +120,10 @@ class InversionResult(dict):
         x = 1.0 / t if xaxis == "frequency" else t
 
         if all:
-            # Filter and sort models
-            models, misfits = self._filter_results(perc)
-            idx = numpy.argsort(misfits)[::-1]
-            models = models[idx]
-            misfits = misfits[idx]
+            # Sort models
+            idx = numpy.argsort(self.misfits)[::-1]
+            models = self.models[idx]
+            misfits = self.misfits[idx]
 
             # Make colormap
             norm = Normalize(misfits.min(), misfits.max())
@@ -160,7 +158,6 @@ class InversionResult(dict):
         parameter,
         zmax=None,
         all=False,
-        perc=0.99,
         plot_args=None,
         ax=None
     ):
@@ -190,11 +187,10 @@ class InversionResult(dict):
         i = parameters[parameter]
 
         if all:
-            # Filter and sort models
-            models, misfits = self._filter_results(perc)
-            idx = numpy.argsort(misfits)[::-1]
-            models = models[idx]
-            misfits = misfits[idx]
+            # Sort models
+            idx = numpy.argsort(self.misfits)[::-1]
+            models = self.models[idx]
+            misfits = self.misfits[idx]
 
             # Make colormap
             norm = Normalize(misfits.min(), misfits.max())
@@ -248,12 +244,19 @@ class InversionResult(dict):
 
         gca.set_xlim(1, self.maxiter)
 
-    def _filter_results(self, perc=0.99):
+    def threshold(self, perc=0.99):
         apost = numpy.exp(-0.5 * self.misfits ** 2)
         threshold = perc * apost.max()
         idx = apost > threshold
-        
-        return self.models[idx], self.misfits[idx]
+
+        return InversionResult(
+            xs=self.xs,
+            models=self.models[idx],
+            misfits=self.misfits[idx],
+            global_misfits=self.global_misfits,
+            maxiter=self.maxiter,
+            popsize=self.popsize,
+        )
 
     def write(self, filename, indent=None):
         from ._io import write
