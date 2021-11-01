@@ -90,12 +90,9 @@ class EarthModel:
                 velocity_models[i, j] = numpy.transpose(self._parse_parameters(x.xall[i, j]))
 
         out = InversionResult(
-            misfit=x.fun,
-            x=x.x,
-            model=numpy.transpose(self._parse_parameters(x.x)),
-            all_x=numpy.concatenate(x.xall),
-            all_models=numpy.concatenate(velocity_models),
-            all_misfits=numpy.concatenate(x.funall),
+            xs=numpy.concatenate(x.xall),
+            models=numpy.concatenate(velocity_models),
+            misfits=numpy.concatenate(x.funall),
             global_misfits=numpy.minimum.accumulate(x.funall.min(axis=1)),
             maxiter=maxiter,
             popsize=popsize,
