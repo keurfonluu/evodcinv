@@ -155,6 +155,26 @@ class InversionResult(dict):
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
+    def plot_misfit(self, plot_args=None, ax=None):
+        # Plot arguments
+        plot_args = plot_args if plot_args is not None else {}
+        _plot_args = {
+            "color": "black",
+            "linewidth": 2,
+        }
+        _plot_args.update(plot_args)
+
+        plot = getattr(plt if ax is None else ax, "plot")
+        plot(numpy.arange(self.maxiter) + 1, self.global_misfits, **_plot_args)
+
+        # Customize axes
+        gca = ax if ax is not None else plt.gca()
+
+        gca.set_xlabel("Iteration")
+        gca.set_ylabel("Misfit")
+
+        gca.set_xlim(1, self.maxiter)
+
     def _filter_results(self, perc=0.99):
         apost = numpy.exp(-0.5 * self.misfits ** 2)
         threshold = perc * apost.max()
