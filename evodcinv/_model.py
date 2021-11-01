@@ -7,16 +7,13 @@ from disba._common import ifunc
 
 from stochopy.optimize import minimize
 
+from ._common import itype
 from ._helpers import InversionSummary, get_velocity_p, nafe_drake
 
 
 Layer = namedtuple("Layer", ["thickness", "velocity_s", "poisson"])
 Curve = namedtuple("Curve", ["period", "data", "mode", "wave", "type", "weight"])
 
-itype = {
-    "phase": 0,
-    "group": 1,
-}
 
 constraints = {
     "cpso": "Shrink",
