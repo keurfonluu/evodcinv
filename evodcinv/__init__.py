@@ -1,7 +1,7 @@
+from .__about__ import __version__
+from ._io import read
 from ._model import EarthModel
 from ._result import InversionResult
-from ._io import read
-from .__about__ import __version__
 
 __all__ = [
     "EarthModel",
@@ -9,4 +9,3 @@ __all__ = [
     "read",
     "__version__",
 ]
-

@@ -1,16 +1,13 @@
 from collections import namedtuple
 
 import numpy
-
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
-
 from stochopy.optimize import minimize
 
 from ._common import itype
 from ._helpers import get_velocity_p, nafe_drake
 from ._result import InversionResult
-
 
 Layer = namedtuple("Layer", ["thickness", "velocity_s", "poisson"])
 Curve = namedtuple("Curve", ["period", "data", "mode", "wave", "type", "weight"])
@@ -48,7 +45,9 @@ class EarthModel:
         assert wave in {"rayleigh", "love"}
         assert type in {"phase", "group", "ellipticity"}
 
-        self._curves.append(Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight))
+        self._curves.append(
+            Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight)
+        )
 
     def set_density_func(self, func):
         self._density_func = func
@@ -71,11 +70,13 @@ class EarthModel:
 
         # Minimize misfit function
         func = lambda x: self._misfit_function(x, algorithm, dc, dt)
-        bounds = numpy.vstack([
-            [layer.thickness for layer in self._layers],
-            [layer.velocity_s for layer in self._layers],
-            [layer.poisson for layer in self._layers],
-        ])
+        bounds = numpy.vstack(
+            [
+                [layer.thickness for layer in self._layers],
+                [layer.velocity_s for layer in self._layers],
+                [layer.poisson for layer in self._layers],
+            ]
+        )
         x = minimize(func, bounds, method=method, options=_optimizer_args)
 
         # Parse output
@@ -85,7 +86,9 @@ class EarthModel:
         velocity_models = numpy.empty((maxiter, popsize, self.n_layers, 4))
         for i in range(maxiter):
             for j in range(popsize):
-                velocity_models[i, j] = numpy.transpose(self._parse_parameters(x.xall[i, j]))
+                velocity_models[i, j] = numpy.transpose(
+                    self._parse_parameters(x.xall[i, j])
+                )
 
         out = InversionResult(
             xs=numpy.concatenate(x.xall),
@@ -99,9 +102,9 @@ class EarthModel:
         return out
 
     def _parse_parameters(self, x):
-        thickness = x[:self.n_layers]
+        thickness = x[: self.n_layers]
         velocity_s = x[self.n_layers : 2 * self.n_layers]
-        poisson = x[2 * self.n_layers:]
+        poisson = x[2 * self.n_layers :]
         velocity_p = get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
 
@@ -130,7 +133,14 @@ class EarthModel:
                     dcalc = c[idx]
 
                 else:
-                    ell = Ellipticity(thickness, velocity_p, velocity_s, density, self._algorithm, self._dc)
+                    ell = Ellipticity(
+                        thickness,
+                        velocity_p,
+                        velocity_s,
+                        density,
+                        self._algorithm,
+                        self._dc,
+                    )
                     rel = ell(curve.period, mode=curve.mode)
                     dcalc = rel.ellipticity
 

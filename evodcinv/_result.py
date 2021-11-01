@@ -1,12 +1,10 @@
-import numpy
-
 import matplotlib.pyplot as plt
+import numpy
+from disba import depthplot, surf96
+from disba._common import ifunc
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
 from matplotlib.ticker import ScalarFormatter
-
-from disba import surf96, depthplot
-from disba._common import ifunc
 
 from ._common import itype, units
 
@@ -27,11 +25,13 @@ class InversionResult(dict):
         if self.keys():
             m = max(map(len, list(self.keys()))) + 1
 
-            return "\n".join([
-                "misfit".rjust(m) + ": " + repr(self.misfit),
-                "x".rjust(m) + ": " + repr(self.x),
-                "model".rjust(m) + ": " + repr(self.model),
-            ])
+            return "\n".join(
+                [
+                    "misfit".rjust(m) + ": " + repr(self.misfit),
+                    "x".rjust(m) + ": " + repr(self.x),
+                    "model".rjust(m) + ": " + repr(self.model),
+                ]
+            )
         else:
             return self.__class__.__name__ + "()"
 
@@ -53,9 +53,21 @@ class InversionResult(dict):
                 xs=numpy.vstack([self.xs, other.xs]),
                 models=numpy.vstack([self.models, other.models]),
                 misfits=numpy.concatenate([self.misfits, other.misfits]),
-                global_misfits=numpy.row_stack((self.global_misfits, other.global_misfits)),
-                maxiter=([self.maxiter] if isinstance(self.maxiter, int) else self.maxiter) + ([other.maxiter] if isinstance(other.maxiter, int) else other.maxiter),
-                popsize=([self.popsize] if isinstance(self.popsize, int) else self.popsize) + ([other.popsize] if isinstance(other.popsize, int) else other.popsize),
+                global_misfits=numpy.row_stack(
+                    (self.global_misfits, other.global_misfits)
+                ),
+                maxiter=(
+                    [self.maxiter] if isinstance(self.maxiter, int) else self.maxiter
+                )
+                + (
+                    [other.maxiter] if isinstance(other.maxiter, int) else other.maxiter
+                ),
+                popsize=(
+                    [self.popsize] if isinstance(self.popsize, int) else self.popsize
+                )
+                + (
+                    [other.popsize] if isinstance(other.popsize, int) else other.popsize
+                ),
             )
 
     def plot_curve(
@@ -98,7 +110,7 @@ class InversionResult(dict):
                 dt,
             )
             idx = c > 0.0
-            
+
             return c[idx]
 
         # Plot arguments
@@ -155,14 +167,7 @@ class InversionResult(dict):
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
-    def plot_model(
-        self,
-        parameter,
-        zmax=None,
-        show="best",
-        plot_args=None,
-        ax=None
-    ):
+    def plot_model(self, parameter, zmax=None, show="best", plot_args=None, ax=None):
         parameters = {
             "velocity_p": 1,
             "velocity_s": 2,

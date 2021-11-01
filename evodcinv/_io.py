@@ -9,10 +9,7 @@ def read(filename):
     with open(filename, "r") as f:
         result = json.load(f)
 
-    result = {
-        k: v if numpy.ndim(v) == 0 else numpy.array(v)
-        for k, v in result.items()
-    }
+    result = {k: v if numpy.ndim(v) == 0 else numpy.array(v) for k, v in result.items()}
 
     return InversionResult(**result)
 
