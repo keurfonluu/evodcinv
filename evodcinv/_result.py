@@ -252,10 +252,8 @@ class InversionResult(dict):
 
         gca.set_xlim(1, self.maxiter)
 
-    def threshold(self, perc=0.99):
-        apost = numpy.exp(-0.5 * self.misfits ** 2)
-        threshold = perc * apost.max()
-        idx = apost > threshold
+    def threshold(self, value):
+        idx = self.misfits <= value
 
         return InversionResult(
             xs=self.xs,

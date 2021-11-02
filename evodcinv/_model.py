@@ -11,7 +11,7 @@ from ._helpers import get_velocity_p, nafe_drake
 from ._result import InversionResult
 
 Layer = namedtuple("Layer", ["thickness", "velocity_s", "poisson"])
-Curve = namedtuple("Curve", ["period", "data", "mode", "wave", "type", "weight"])
+Curve = namedtuple("Curve", ["period", "data", "mode", "wave", "type", "weight", "uncertainties"])
 
 
 constraints = {
@@ -40,15 +40,28 @@ class EarthModel:
 
         self._layers.append(Layer(tuple(thickness), tuple(velocity_s), tuple(poisson)))
 
-    def add_curve(self, period, data, mode, wave, type, weight=1.0):
+    def add_curve(self, period, data, mode, wave, type, weight=1.0, uncertainties=None):
         assert len(period) == len(data)
         assert mode >= 0
         assert wave in {"rayleigh", "love"}
         assert type in {"phase", "group", "ellipticity"}
         assert is_sorted(period)
 
+        if uncertainties is None:
+            uncertainties = numpy.ones_like(data)
+
+        elif isinstance(uncertainties, (int, float)):
+            uncertainties = numpy.full_like(data, uncertainties)
+
+        elif numpy.ndim(uncertainties) == 1:
+            assert len(uncertainties) == len(data)
+            uncertainties = numpy.asarray(uncertainties)
+
+        else:
+            raise ValueError()
+
         self._curves.append(
-            Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight)
+            Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight, uncertainties)
         )
 
     def set_density_func(self, func):
@@ -148,7 +161,7 @@ class EarthModel:
                     dcalc = rel.ellipticity
 
                 n = len(dcalc)
-                error += curve.weight * numpy.sum((dcalc - curve.data[:n]) ** 2)
+                error += curve.weight * numpy.sum(((dcalc - curve.data[:n]) / curve.uncertainties[:n]) ** 2)
 
             except DispersionError:
                 return numpy.Inf
