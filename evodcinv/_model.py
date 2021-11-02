@@ -88,7 +88,7 @@ class EarthModel:
         func = lambda x: self._misfit_function(x, algorithm, dc, dt)
         bounds = numpy.vstack(
             [
-                [layer.thickness for layer in self._layers],
+                [layer.thickness for layer in self._layers[:-1]],
                 [layer.velocity_s for layer in self._layers],
                 [layer.poisson for layer in self._layers],
             ]
@@ -118,13 +118,13 @@ class EarthModel:
         return out
 
     def _parse_parameters(self, x):
-        thickness = x[: self.n_layers]
-        velocity_s = x[self.n_layers : 2 * self.n_layers]
-        poisson = x[2 * self.n_layers :]
+        thickness = x[: self.n_layers - 1]
+        velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1]
+        poisson = x[2 * self.n_layers - 1 :]
         velocity_p = get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
 
-        return thickness, velocity_p, velocity_s, density
+        return numpy.append(thickness, 1.0), velocity_p, velocity_s, density
 
     def _misfit_function(self, x, algorithm, dc, dt):
         thickness, velocity_p, velocity_s, density = self._parse_parameters(x)
