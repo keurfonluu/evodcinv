@@ -98,7 +98,7 @@ class InversionResult(dict):
 
         def getc(thickness, velocity_p, velocity_s, density):
             c = surf96(
-                t,
+                period,
                 thickness,
                 velocity_p,
                 velocity_s,
@@ -131,7 +131,7 @@ class InversionResult(dict):
 
         plot_type = plot_type if plot_type != "line" else "plot"
         plot = getattr(plt if ax is None else ax, plot_type)
-        x = 1.0 / t if xaxis == "frequency" else t
+        x = 1.0 / period if xaxis == "frequency" else period
 
         if show == "all":
             # Sort models
@@ -248,7 +248,7 @@ class InversionResult(dict):
         gca = ax if ax is not None else plt.gca()
 
         gca.set_xlabel("Iteration")
-        gca.set_ylabel("Misfit")
+        gca.set_ylabel("Misfit value")
 
         gca.set_xlim(1, self.maxiter)
 
