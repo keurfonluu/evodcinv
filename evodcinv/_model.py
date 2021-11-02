@@ -68,7 +68,8 @@ class EarthModel:
 
         # Overwrite options
         _optimizer_args["return_all"] = True
-        _optimizer_args["constraints"] = constraints[method]
+        if method != "na":
+            _optimizer_args["constraints"] = constraints[method]
 
         # Minimize misfit function
         func = lambda x: self._misfit_function(x, algorithm, dc, dt)
