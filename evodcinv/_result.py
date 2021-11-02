@@ -72,7 +72,7 @@ class InversionResult(dict):
 
     def plot_curve(
         self,
-        t,
+        period,
         mode,
         wave,
         type,

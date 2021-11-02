@@ -166,7 +166,7 @@ class EarthModel:
             except DispersionError:
                 return numpy.Inf
 
-        return error
+        return 0.5 * error
 
     def _get_density(self, velocity_p):
         return numpy.array([self._density_func(vp) for vp in velocity_p])
