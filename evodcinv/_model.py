@@ -27,6 +27,7 @@ class EarthModel:
     def __init__(self):
         self._layers = []
         self._curves = []
+        self._extra_terms = []
         self._density_func = nafe_drake
 
     def add_layer(self, thickness, velocity_s, poisson=[0.2, 0.4]):
@@ -63,6 +64,9 @@ class EarthModel:
         self._curves.append(
             Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight, uncertainties)
         )
+
+    def add_misfit_term(self, func):
+        self._extra_terms.append(func)
 
     def set_density_func(self, func):
         self._density_func = func
@@ -129,7 +133,16 @@ class EarthModel:
     def _misfit_function(self, x, algorithm, dc, dt):
         thickness, velocity_p, velocity_s, density = self._parse_parameters(x)
 
+        error_extra = 0.0
+        if len(self._extra_terms):
+            for extra_term in self._extra_terms:
+                error_extra += extra_term(x)
+
+            if numpy.isinf(error_extra):
+                return numpy.Inf
+
         error = 0.0
+        weights_sum = 0.0
         for curve in self._curves:
             try:
                 if curve.type != "ellipticity":
@@ -154,19 +167,20 @@ class EarthModel:
                         velocity_p,
                         velocity_s,
                         density,
-                        self._algorithm,
-                        self._dc,
+                        algorithm,
+                        dc,
                     )
                     rel = ell(curve.period, mode=curve.mode)
-                    dcalc = rel.ellipticity
+                    dcalc = numpy.abs(rel.ellipticity)
 
                 n = len(dcalc)
-                error += curve.weight * numpy.sum(((dcalc - curve.data[:n]) / curve.uncertainties[:n]) ** 2)
+                error += curve.weight * (numpy.sum(((dcalc - curve.data[:n]) / curve.uncertainties[:n]) ** 2) / n) ** 0.5
+                weights_sum += curve.weight
 
             except DispersionError:
                 return numpy.Inf
 
-        return 0.5 * error
+        return error / weights_sum + error_extra
 
     def _get_density(self, velocity_p):
         return numpy.array([self._density_func(vp) for vp in velocity_p])
@@ -180,9 +194,17 @@ class EarthModel:
         return self._curves
 
     @property
+    def extra_terms(self):
+        return self._extra_terms
+
+    @property
     def n_layers(self):
         return len(self._layers)
 
     @property
     def n_curves(self):
         return len(self._curves)
+
+    @property
+    def n_extra_terms(self):
+        return len(self._extra_terms)
