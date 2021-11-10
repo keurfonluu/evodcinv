@@ -30,7 +30,7 @@ class EarthModel:
         self._extra_terms = []
 
         self.set_misfit_func("rmse")
-        self._density_func = nafe_drake
+        self.set_density_func("nafe-drake")
 
     def add_layer(self, thickness, velocity_s, poisson=[0.2, 0.4]):
         assert len(thickness) == 2
@@ -85,7 +85,14 @@ class EarthModel:
             raise ValueError()
 
     def set_density_func(self, func):
-        self._density_func = func
+        if func == "nafe-drake":
+            self._density_func = nafe_drake
+
+        elif hasattr(func, "__call__"):
+            self._density_func = func
+
+        else:
+            raise ValueError()
 
     def invert(self, algorithm="dunkin", dc=0.001, dt=0.01, optimizer_args=None):
         # Optimizer arguments
