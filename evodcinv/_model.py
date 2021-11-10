@@ -130,7 +130,7 @@ class EarthModel:
         for i in range(maxiter):
             for j in range(popsize):
                 velocity_models[i, j] = numpy.transpose(
-                    self._parse_parameters(x.xall[i, j])
+                    self.transform(x.xall[i, j])
                 )
 
         out = InversionResult(
@@ -144,7 +144,7 @@ class EarthModel:
 
         return out
 
-    def _parse_parameters(self, x):
+    def transform(self, x):
         thickness = x[: self.n_layers - 1]
         velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1]
         poisson = x[2 * self.n_layers - 1 :]
@@ -154,7 +154,7 @@ class EarthModel:
         return numpy.append(thickness, 1.0), velocity_p, velocity_s, density
 
     def _misfit_function(self, x, algorithm, dc, dt):
-        thickness, velocity_p, velocity_s, density = self._parse_parameters(x)
+        thickness, velocity_p, velocity_s, density = self.transform(x)
 
         error_extra = 0.0
         if len(self._extra_terms):
