@@ -28,6 +28,8 @@ class EarthModel:
         self._layers = []
         self._curves = []
         self._extra_terms = []
+
+        self.set_misfit_func("rmse")
         self._density_func = nafe_drake
 
     def add_layer(self, thickness, velocity_s, poisson=[0.2, 0.4]):
@@ -48,18 +50,16 @@ class EarthModel:
         assert type in {"phase", "group", "ellipticity"}
         assert is_sorted(period)
 
-        if uncertainties is None:
-            uncertainties = numpy.ones_like(data)
+        if uncertainties is not None:
+            if isinstance(uncertainties, (int, float)):
+                uncertainties = numpy.full_like(data, uncertainties)
 
-        elif isinstance(uncertainties, (int, float)):
-            uncertainties = numpy.full_like(data, uncertainties)
+            elif numpy.ndim(uncertainties) == 1:
+                assert len(uncertainties) == len(data)
+                uncertainties = numpy.asarray(uncertainties)
 
-        elif numpy.ndim(uncertainties) == 1:
-            assert len(uncertainties) == len(data)
-            uncertainties = numpy.asarray(uncertainties)
-
-        else:
-            raise ValueError()
+            else:
+                raise ValueError()
 
         self._curves.append(
             Curve(numpy.asarray(period), numpy.asarray(data), mode, wave, type, weight, uncertainties)
@@ -67,6 +67,22 @@ class EarthModel:
 
     def add_misfit_term(self, func):
         self._extra_terms.append(func)
+
+    def set_misfit_func(self, func):
+        if func == "norm1":
+            self._misfit_func = lambda x: numpy.abs(x).sum()
+
+        elif func == "norm2":
+            self._misfit_func = lambda x: numpy.square(x).sum()
+
+        elif func == "rmse":
+            self._misfit_func = lambda x: (numpy.square(x).sum() / len(x)) ** 0.5
+
+        elif hasattr(func, "__call__"):
+            self._misfit_func = func
+
+        else:
+            raise ValueError()
 
     def set_density_func(self, func):
         self._density_func = func
@@ -174,7 +190,12 @@ class EarthModel:
                     dcalc = numpy.abs(rel.ellipticity)
 
                 n = len(dcalc)
-                error += curve.weight * (numpy.sum(((dcalc - curve.data[:n]) / curve.uncertainties[:n]) ** 2) / n) ** 0.5
+                sigma = (
+                    curve.data[:n]
+                    if curve.uncertainties is None
+                    else curve.uncertainties[:n]
+                )
+                error += curve.weight * self._misfit_func((dcalc - curve.data[:n]) / sigma)
                 weights_sum += curve.weight
 
             except DispersionError:
