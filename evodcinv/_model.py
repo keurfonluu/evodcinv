@@ -9,6 +9,7 @@ from stochopy.optimize import minimize
 from ._common import itype
 from ._helpers import get_velocity_p, nafe_drake
 from ._result import InversionResult
+from ._progress import ProgressBar
 
 Layer = namedtuple("Layer", ["thickness", "velocity_s", "poisson"])
 Curve = namedtuple("Curve", ["period", "data", "mode", "wave", "type", "weight", "uncertainties"])
@@ -120,7 +121,13 @@ class EarthModel:
                 [layer.poisson for layer in self._layers],
             ]
         )
-        x = minimize(func, bounds, method=method, options=_optimizer_args)
+
+        with ProgressBar(max=_optimizer_args["maxiter"]) as bar:
+            def callback(X, res):
+                bar.misfit = res.fun
+                bar.next()
+
+            x = minimize(func, bounds, method=method, options=_optimizer_args, callback=callback)
 
         # Parse output
         maxiter = _optimizer_args["maxiter"]
