@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy
-from disba import depthplot, surf96
+from disba import depthplot, surf96, Ellipticity
 from disba._common import ifunc
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
@@ -81,6 +81,7 @@ class InversionResult(dict):
         plot_args=None,
         ax=None,
     ):
+        assert type in {"phase", "group", "ellipticity"}
         assert show in {"best", "all"}
 
         # disba arguments
@@ -88,7 +89,7 @@ class InversionResult(dict):
         _disba_args = {
             "algorithm": "dunkin",
             "dc": 0.001,
-            "dt": 0.025,
+            "dt": 0.01,
         }
         _disba_args.update(disba_args)
 
@@ -96,38 +97,56 @@ class InversionResult(dict):
         dc = _disba_args.pop("dc")
         dt = _disba_args.pop("dt")
 
-        def getc(thickness, velocity_p, velocity_s, density):
-            c = surf96(
-                period,
-                thickness,
-                velocity_p,
-                velocity_s,
-                density,
-                mode,
-                itype[type],
-                ifunc[algorithm][wave],
-                dc,
-                dt,
-            )
-            idx = c > 0.0
+        if type in {"phase", "group"}:
+            def get_y(thickness, velocity_p, velocity_s, density):
+                c = surf96(
+                    period,
+                    thickness,
+                    velocity_p,
+                    velocity_s,
+                    density,
+                    mode,
+                    itype[type],
+                    ifunc[algorithm][wave],
+                    dc,
+                    dt,
+                )
+                idx = c > 0.0
 
-            return c[idx]
+                return c[idx]
+
+        else:
+            def get_y(thickness, velocity_p, velocity_s, density):
+                ell = Ellipticity(
+                    thickness,
+                    velocity_p,
+                    velocity_s,
+                    density,
+                    algorithm,
+                    dc,
+                )
+                rel = ell(period, mode)
+
+                return numpy.abs(rel.ellipticity)
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
         _plot_args = {
             "type": "line",
             "xaxis": "period",
+            "yaxis": "velocity",
             "cmap": "viridis_r",
         }
         _plot_args.update(plot_args)
 
         plot_type = _plot_args.pop("type")
         xaxis = _plot_args.pop("xaxis")
+        yaxis = _plot_args.pop("yaxis")
         cmap = _plot_args.pop("cmap")
 
         assert plot_type in {"line", "loglog", "semilogx", "semilogy"}
         assert xaxis in {"frequency", "period"}
+        assert yaxis in {"slowness", "velocity"}
 
         plot_type = plot_type if plot_type != "line" else "plot"
         plot = getattr(plt if ax is None else ax, plot_type)
@@ -145,23 +164,34 @@ class InversionResult(dict):
             smap.set_array([])
 
             # Generate and plot curves
-            curves = [getc(*model.T) for model in models]
+            curves = [get_y(*model.T) for model in models]
             for curve, misfit in zip(curves, misfits):
-                plot(x, curve, color=smap.to_rgba(misfit), **_plot_args)
+                y = (
+                    1.0 / curve
+                    if "type" != "ellipticity" and yaxis == "slowness"
+                    else curve
+                )
+                plot(x, y, color=smap.to_rgba(misfit), **_plot_args)
 
         elif show == "best":
-            c = getc(*self.model.T)
-            plot(x, c, **_plot_args)
+            curve = get_y(*self.model.T)
+            y = (
+                1.0 / curve
+                if "type" != "ellipticity" and yaxis == "slowness"
+                else curve
+            )
+            plot(x, y, **_plot_args)
 
         # Customize axes
         gca = ax if ax is not None else plt.gca()
 
         xlabel = f"{xaxis.capitalize()} [{units[xaxis]}]"
-        ylabel = f"{type.capitalize()} velocity [km/s]"
+        ylabel = f"{type.capitalize()} "
+        ylabel += "[H/V]" if type == "ellipticity" else f"{yaxis} [km/s]"
         gca.set_xlabel(xlabel)
         gca.set_ylabel(ylabel)
 
-        gca.set_xlim(x.min(), x.max())
+        # gca.set_xlim(x.min(), x.max())
 
         # Disable exponential tick labels
         gca.xaxis.set_major_formatter(ScalarFormatter())
