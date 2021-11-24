@@ -8,9 +8,8 @@ class ProgressBar(IncrementalBar):
         super().__init__(*args, **kwargs)
         
         self.width = 20
-        self.message = "Inverting"
-        self.suffix = "%(percent)d%% [%(elapsed_td)s / %(eta_td)s] - Misfit: %(misfit).4f"
-        self.check_tty=False
+        self.suffix = "%(percent)3d%% [%(elapsed_td)s / %(eta_td)s] - Misfit: %(misfit).4f"
+        self.check_tty = False
         self.misfit = numpy.Inf
 
     @property
