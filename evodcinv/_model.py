@@ -26,7 +26,7 @@ class EarthModel:
 
         return self.layers.pop(-1)
 
-    def configure(self, optimizer="cpso", misfit="rmse", density="nafe-drake", dc=0.001, dt=0.01, optimizer_args=None, extra_terms=None):
+    def configure(self, optimizer="cpso", misfit="rmse", density="nafe-drake", normalize_weights=True, extra_terms=None, dc=0.001, dt=0.01, optimizer_args=None):
         assert optimizer in {"cmaes", "cpso", "de", "na", "pso", "vdcma"}
         assert misfit in {"norm1", "norm2", "rmse"} or hasattr(misfit, "__call__")
         assert density in {"nafe-drake"} or hasattr(density, "__call__")
@@ -61,8 +61,9 @@ class EarthModel:
             "density": density,
             "dc": dc,
             "dt": dt,
-            "optimizer_args": optimizer_args,
+            "normalize_weights": normalize_weights,
             "extra_terms": extra_terms,
+            "optimizer_args": optimizer_args,
         }
 
     def invert(self, curves, maxrun=1, split_results=False):
@@ -163,9 +164,10 @@ class EarthModel:
     def _misfit_function(self, x, curves):
         thickness, velocity_p, velocity_s, density = self.transform(x)
         misfit = self._configuration["misfit"]
+        normalize_weights = self._configuration["normalize_weights"]
+        extra_terms = self._configuration["extra_terms"]
         dc = self._configuration["dc"]
         dt = self._configuration["dt"]
-        extra_terms = self._configuration["extra_terms"]
 
         error_extra = 0.0
         if len(extra_terms):
@@ -207,18 +209,25 @@ class EarthModel:
                     dcalc = numpy.abs(rel.ellipticity)
 
                 n = len(dcalc)
-                sigma = (
-                    curve.data[:n]
-                    if curve.uncertainties is None
-                    else curve.uncertainties[:n]
-                )
-                error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
-                weights_sum += curve.weight
+                if n > 0:
+                    sigma = (
+                        curve.data[:n]
+                        if curve.uncertainties is None
+                        else curve.uncertainties[:n]
+                    )
+                    error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
+                    weights_sum += curve.weight
+
+                else:
+                    return numpy.Inf
 
             except DispersionError:
                 return numpy.Inf
 
-        return error / weights_sum + error_extra
+        if normalize_weights:
+            error /= weights_sum
+
+        return error + error_extra
 
     def _get_density(self, velocity_p):
         try:
