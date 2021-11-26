@@ -294,10 +294,10 @@ class InversionResult(dict):
             popsize=self.popsize,
         )
 
-    def write(self, filename, indent=None):
+    def write(self, filename, file_format=None, **kwargs):
         from ._io import write
 
-        write(filename, self, indent)
+        write(filename, self, file_format, **kwargs)
 
     @property
     def misfit(self):

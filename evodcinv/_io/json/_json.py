@@ -2,7 +2,7 @@ import json
 
 import numpy
 
-from ._result import InversionResult
+from ..._result import InversionResult
 
 
 def read(filename):
