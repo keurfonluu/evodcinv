@@ -332,8 +332,12 @@ class InversionResult(dict):
         xmax = numpy.max(maxiter) if run == "all" else maxiter[run - 1]
         gca.set_xlim(1, xmax)
 
-    def threshold(self, value):
-        idx = self.misfits <= value
+    def threshold(self, value=None):
+        idx = (
+            ~numpy.isinf(self.misfits)
+            if value is None
+            else self.misfits <= value
+        )
 
         return InversionResult(
             xs=self.xs,
