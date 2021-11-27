@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy
-from disba import depthplot, surf96, Ellipticity
+from disba import depthplot, resample, surf96, Ellipticity
 from disba._common import ifunc
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
@@ -69,6 +69,35 @@ class InversionResult(dict):
                     [other.popsize] if isinstance(other.popsize, int) else other.popsize
                 ),
             )
+
+    def mean(self, dz, zmax=None):
+
+        def profile(thickness, parameter, z):
+            zp, fp = resample(thickness, parameter, dz)
+            zp = zp.cumsum()
+
+            return numpy.interp(z, zp, fp)
+
+        models = self.models
+        misfits = self.misfits
+
+        if zmax is None:
+            zmax = numpy.max([model[:-1, 0].sum() for model in models])
+        nz = numpy.ceil(zmax / dz).astype(int)
+        z = dz * numpy.arange(nz)
+
+        mean_model = numpy.column_stack([
+            numpy.average(
+                [profile(model[:, 0], model[:, i + 1], z) for model in models],
+                axis=0,
+                weights=1.0 / misfits,
+            )
+            for i in range(3)
+            ]
+        )
+        d = numpy.full_like(z, dz)
+
+        return d, *mean_model.T
 
     def plot_curve(
         self,
