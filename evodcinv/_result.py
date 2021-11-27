@@ -109,10 +109,14 @@ class InversionResult(dict):
         wave,
         type,
         show="best",
+        stride=1,
+        n_jobs=-1,
         disba_args=None,
         plot_args=None,
         ax=None,
     ):
+        from joblib import Parallel, delayed
+
         assert type in {"phase", "group", "ellipticity"}
         assert show in {"best", "all"}
 
@@ -190,20 +194,24 @@ class InversionResult(dict):
             models = self.models[idx]
             misfits = self.misfits[idx]
 
+            # Skip models
+            models = models[::stride]
+            misfits = misfits[::stride]
+
             # Make colormap
             norm = Normalize(misfits.min(), misfits.max())
             smap = ScalarMappable(norm, cmap)
             smap.set_array([])
 
             # Generate and plot curves
-            curves = [get_y(*model.T) for model in models]
+            curves = Parallel(n_jobs=n_jobs)(delayed(get_y)(*model.T) for model in models)
             for curve, misfit in zip(curves, misfits):
                 y = (
                     1.0 / curve
                     if "type" != "ellipticity" and yaxis == "slowness"
                     else curve
                 )
-                plot(x, y, color=smap.to_rgba(misfit), **_plot_args)
+                plot(x[:len(y)], y, color=smap.to_rgba(misfit), **_plot_args)
 
         elif show == "best":
             curve = get_y(*self.model.T)
@@ -212,7 +220,7 @@ class InversionResult(dict):
                 if "type" != "ellipticity" and yaxis == "slowness"
                 else curve
             )
-            plot(x, y, **_plot_args)
+            plot(x[:len(y)], y, **_plot_args)
 
         # Customize axes
         gca = ax if ax is not None else plt.gca()
@@ -223,13 +231,11 @@ class InversionResult(dict):
         gca.set_xlabel(xlabel)
         gca.set_ylabel(ylabel)
 
-        # gca.set_xlim(x.min(), x.max())
-
         # Disable exponential tick labels
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
-    def plot_model(self, parameter, zmax=None, show="best", dz=None, plot_args=None, ax=None):
+    def plot_model(self, parameter, zmax=None, show="best", stride=1, dz=None, plot_args=None, ax=None):
         parameters = {
             "velocity_p": 1,
             "velocity_s": 2,
@@ -262,6 +268,10 @@ class InversionResult(dict):
             idx = numpy.argsort(self.misfits)[::-1]
             models = self.models[idx]
             misfits = self.misfits[idx]
+
+            # Skip models
+            models = models[::stride]
+            misfits = misfits[::stride]
 
             # Make colormap
             norm = Normalize(misfits.min(), misfits.max())
