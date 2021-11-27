@@ -296,7 +296,14 @@ class InversionResult(dict):
         gca.set_xlabel(xlabel)
         gca.set_ylabel(ylabel)
 
-    def plot_misfit(self, plot_args=None, ax=None):
+    def plot_misfit(self, run="all", plot_args=None, ax=None):
+        maxiter = self.maxiter if self.n_runs > 1 else [self.maxiter]
+        global_misfits = self.global_misfits if self.n_runs > 1 else [self.global_misfits]
+
+        assert run in {"all"} or (isinstance(run, int) and run > 0)
+        if isinstance(run, int) and run > 1:
+            assert run <= self.n_runs
+
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
         _plot_args = {
@@ -306,7 +313,12 @@ class InversionResult(dict):
         _plot_args.update(plot_args)
 
         plot = getattr(plt if ax is None else ax, "plot")
-        plot(numpy.arange(self.maxiter) + 1, self.global_misfits, **_plot_args)
+        if run == "all":
+            for n, misfits in zip(maxiter, global_misfits):
+                plot(numpy.arange(n) + 1, misfits, **_plot_args)
+
+        else:
+            plot(numpy.arange(maxiter[run - 1]) + 1, global_misfits[run - 1], **_plot_args)
 
         # Customize axes
         gca = ax if ax is not None else plt.gca()
@@ -314,7 +326,8 @@ class InversionResult(dict):
         gca.set_xlabel("Iteration")
         gca.set_ylabel("Misfit value")
 
-        gca.set_xlim(1, self.maxiter)
+        xmax = numpy.max(maxiter) if run == "all" else maxiter[run - 1]
+        gca.set_xlim(1, xmax)
 
     def threshold(self, value):
         idx = self.misfits <= value
@@ -344,3 +357,11 @@ class InversionResult(dict):
     @property
     def model(self):
         return self.models[self.misfits.argmin()]
+
+    @property
+    def n_runs(self):
+        return (
+            len(self.maxiter)
+            if numpy.ndim(self.maxiter)
+            else 1
+        )
