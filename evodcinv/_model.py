@@ -16,6 +16,9 @@ class EarthModel:
         self._layers = []
         self._configuration = {}
 
+    def __len__(self):
+        return self.n_layers
+
     def add(self, layer):
         assert isinstance(layer, Layer)
 

@@ -39,6 +39,9 @@ class InversionResult(dict):
         """Return a list of attributes."""
         return list(self.keys())
 
+    def __len__(self):
+        return len(self.models)
+
     def __add__(self, other):
         assert isinstance(other, InversionResult)
 
