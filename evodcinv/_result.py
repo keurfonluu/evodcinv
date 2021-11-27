@@ -97,7 +97,7 @@ class InversionResult(dict):
         )
         d = numpy.full_like(z, dz)
 
-        return d, *mean_model.T
+        return numpy.column_stack((d, mean_model))
 
     def plot_curve(
         self,
@@ -226,7 +226,7 @@ class InversionResult(dict):
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
-    def plot_model(self, parameter, zmax=None, show="best", plot_args=None, ax=None):
+    def plot_model(self, parameter, zmax=None, show="best", dz=None, plot_args=None, ax=None):
         parameters = {
             "velocity_p": 1,
             "velocity_s": 2,
@@ -236,7 +236,9 @@ class InversionResult(dict):
             "rho": 3,
         }
         assert parameter in parameters
-        assert show in {"best", "all"}
+        assert show in {"best", "mean", "all"}
+        if show == "mean":
+            assert dz is not None
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
@@ -250,7 +252,6 @@ class InversionResult(dict):
         cmap = _plot_args.pop("cmap")
 
         # Plot
-        plot = getattr(plt if ax is None else ax, "plot")
         i = parameters[parameter]
 
         if show == "all":
@@ -270,8 +271,12 @@ class InversionResult(dict):
                 tmp["color"] = smap.to_rgba(misfit)
                 depthplot(model[:, 0], model[:, i], zmax, plot_args=tmp, ax=ax)
 
-        elif show == "best":
-            model = self.model
+        else:
+            model = (
+                self.model
+                if show == "best"
+                else self.mean(dz, zmax)
+            )
             depthplot(model[:, 0], model[:, i], zmax, plot_args=_plot_args, ax=ax)
 
         # Customize axes
