@@ -40,9 +40,11 @@ class InversionResult(dict):
         return list(self.keys())
 
     def __len__(self):
+        """Return number of models."""
         return len(self.models)
 
     def __add__(self, other):
+        """Concatenate inversion results."""
         assert isinstance(other, InversionResult)
 
         if not self.keys():
@@ -74,8 +76,20 @@ class InversionResult(dict):
             )
 
     def mean(self, dz, zmax=None):
+        """
+        Calculate mean velocity model.
+
+        Parameters
+        ----------
+        dz : scalar
+            Maximum layer thickness (in km).
+        zmax : scalar or None, optional, default None
+            Depth of last data point.
+        
+        """
 
         def profile(thickness, parameter, z):
+            """Interpolate along model depth."""
             zp, fp = resample(thickness, parameter, dz)
             zp = zp.cumsum()
 
@@ -115,6 +129,33 @@ class InversionResult(dict):
         plot_args=None,
         ax=None,
     ):
+        """
+        Plot calculated data curves.
+
+        Parameters
+        ----------
+        period : array_like
+            Periods (in s).
+        mode : int, optional, default 0
+            Mode number (0 if fundamental).
+        wave : str {'love', 'rayleigh'}, optional, default 'rayleigh'
+            Wave type.
+        type : str {'phase', 'group', 'ellipticity'}, optional, default 'phase'
+            Data type.
+        show : str {'best', 'all'}, optional, default 'best'
+            Model to use to calculate data curves.
+        stride : int, optional, default 1
+            Number of models to skip.
+        n_jobs : int, optional, default -1
+            Number of CPU cores to calculate data curves in parallel. Supply -1 to use all available CPU cores. Only used if ``show == 'all'``.
+        disba_args : dict or None, optional, default None
+            A dictionary of options to pass to :mod:`disba`.
+        plot_args : dict or None, optional, default None
+            A dictionary of options to pass to plotting function.
+        ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
+            Matplotlib axes. If `None`, use current axes.
+        
+        """
         from joblib import Parallel, delayed
 
         assert type in {"phase", "group", "ellipticity"}
@@ -236,6 +277,32 @@ class InversionResult(dict):
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
     def plot_model(self, parameter, zmax=None, show="best", stride=1, dz=None, plot_args=None, ax=None):
+        """
+        Plot model parameter as a function of depth.
+
+        Parameters
+        ----------
+        parameter : str
+            Parameter to plot. Should be one of:
+
+             - 'velocity_p' or 'vp'
+             - 'velocity_s' or 'vs'
+             - 'density' or 'rho'
+
+        zmax : scalar or None, optional, default None
+            Depth of last data point.
+        show : str {'best', 'all'}, optional, default 'best'
+            Model to plot.
+        stride : int, optional, default 1
+            Number of models to skip.
+        dz : scalar
+            Maximum layer thickness (in km).
+        plot_args : dict or None, optional, default None
+            A dictionary of options to pass to plotting function.
+        ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
+            Matplotlib axes. If `None`, use current axes.
+
+        """
         parameters = {
             "velocity_p": 1,
             "velocity_s": 2,
@@ -310,6 +377,19 @@ class InversionResult(dict):
         gca.set_ylabel(ylabel)
 
     def plot_misfit(self, run="all", plot_args=None, ax=None):
+        """
+        Plot misfit as a function of iteration number.
+
+        Parameters
+        ----------
+        run : int or str {'all'}, optional, default 'all'
+            Run for which misfit to be plot.
+        plot_args : dict or None, optional, default None
+            A dictionary of options to pass to plotting function.
+        ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
+            Matplotlib axes. If `None`, use current axes.
+        
+        """
         maxiter = self.maxiter if self.n_runs > 1 else [self.maxiter]
         global_misfits = self.global_misfits if self.n_runs > 1 else [self.global_misfits]
 
@@ -343,6 +423,22 @@ class InversionResult(dict):
         gca.set_xlim(1, xmax)
 
     def threshold(self, value=None):
+        """
+        Apply a threshold filter.
+
+        Remove models that do not satisfy the threshold criterion.
+
+        Parameters
+        ----------
+        value : scalar or None, optional, default None
+            Single value to be used for the data threshold. If None, remove invalid models (i.e., with misfit equal to Inf).
+        
+        Returns
+        -------
+        :class:`evodcinv.InversionResult`
+            Inversion results with models that satisfy the threshold criterion.
+
+        """
         idx = (
             ~numpy.isinf(self.misfits)
             if value is None
@@ -359,24 +455,39 @@ class InversionResult(dict):
         )
 
     def write(self, filename, file_format=None, **kwargs):
+        """
+        Write inversion results to a file.
+
+        Parameters
+        ----------
+        filename : str
+            Output file name.
+        file_format : str {'h5', 'json'} or None, optional, default None
+            Output file format.
+        
+        """
         from ._io import write
 
         write(filename, self, file_format, **kwargs)
 
     @property
     def misfit(self):
+        """Return best fit model misfit."""
         return self.misfits.min()
 
     @property
     def x(self):
+        """Return best fit model parameters."""
         return self.xs[self.misfits.argmin()]
 
     @property
     def model(self):
+        """Return best fit model."""
         return self.models[self.misfits.argmin()]
 
     @property
     def n_runs(self):
+        """Return number of runs."""
         return (
             len(self.maxiter)
             if numpy.ndim(self.maxiter)

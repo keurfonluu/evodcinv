@@ -13,23 +13,88 @@ from ._layer import Layer
 
 class EarthModel:
     def __init__(self):
+        """Layered Earth model class."""
         self._layers = []
         self._configuration = {}
 
     def __len__(self):
+        """Return number of layers in model."""
         return self.n_layers
 
     def add(self, layer):
+        """
+        Add a new layer.
+        
+        Parameters
+        ----------
+        layer : :class:`evodcinv.Layer`
+            Layer to add.
+        
+        """
         assert isinstance(layer, Layer)
 
         self.layers.append(layer)
 
     def pop(self):
+        """
+        Remove last layer.
+
+        Returns
+        -------
+        :class:`evodcinv.Layer`
+            Last layer.
+        
+        """
         assert self.n_layers
 
         return self.layers.pop(-1)
 
     def configure(self, optimizer="cpso", misfit="rmse", density="nafe-drake", normalize_weights=True, extra_terms=None, dc=0.001, dt=0.01, optimizer_args=None):
+        """
+        Configure misfit function to minimize.
+
+        Parameters
+        ----------
+        optimizer : str, optional, default 'cpso'
+            Type of solver. Should be one of:
+
+             - 'cmaes'
+             - 'cpso'
+             - 'de'
+             - 'na'
+             - 'pso'
+             - 'vdcma'
+
+        misfit : str or callable, optional, default 'rmse'
+            Function to evaluate error. If callable, must be in the form ``f(e)``, where ``e`` is the error between observed and calculated data in the form of a 1-D array. If str, should be one of:
+
+             - 'norm1'
+             - 'norm2'
+             - 'rmse'
+
+        density : str or callable, optional, default 'nafe-drake'
+            Function to evaluate density. If callable, must be in the form ``f(vp)``, where ``vp`` is the P-wave velocity (in km/s). If str, should be one of:
+
+             - 'nafe-drake'
+
+        normalize_weights : bool, optional, default True
+            If `True`, weights associated to individual misfit terms are normalized.
+        extra_terms : sequence of callable, optional, default True
+            Additional misfit terms. Must be a sequence of callables.
+        dc : scalar, optional, default 0.005
+            Phase velocity increment for root finding.
+        dt : scalar, optional, default 0.025
+            Frequency increment (%) for calculating group velocity.
+        optimizer_args : dict, optional, default None
+            A dictionary of solver options. All methods accept the following generic options:
+
+             - maxiter (int): maximum number of iterations to perform
+             - popsize (int): total population size
+             - seed (int or None): seed for random number generator
+            
+            See :mod:`stochopy`'s documentation for more options.
+        
+        """
         assert optimizer in {"cmaes", "cpso", "de", "na", "pso", "vdcma"}
         assert misfit in {"norm1", "norm2", "rmse"} or hasattr(misfit, "__call__")
         assert density in {"nafe-drake"} or hasattr(density, "__call__")
@@ -70,6 +135,24 @@ class EarthModel:
         }
 
     def invert(self, curves, maxrun=1, split_results=False):
+        """
+        Invert model.
+
+        Parameters
+        ----------
+        curves : sequence of :class:`evodcinv.Curve`
+            Sequence of data curves to fit.
+        maxrun : int, optional, default 1
+            Maximum number of runs. Each run starts with a different population.
+        split_results : bool, optional, default False
+            If `True`, results of the different runs are not concatenated.
+
+        Returns
+        -------
+        :class:`evodcinv.InversionResult` or sequence of :class:`evodcinv.InversionResult`
+            Inversion results.
+
+        """
         assert self._configuration
         assert isinstance(curves, (list, tuple))
         for curve in curves:
@@ -156,6 +239,26 @@ class EarthModel:
             return out
 
     def transform(self, x):
+        """
+        Transform model parameters to velocity model.
+
+        Parameters
+        ----------
+        x : array_like
+            Model parameters.
+
+        Returns
+        -------
+        array_like
+            Layer thickness.
+        array_like
+            Layer P-wave velocity.
+        array_like
+            Layer S-wave velocity.
+        array_like
+            Layer density.
+        
+        """
         thickness = x[: self.n_layers - 1]
         velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1]
         poisson = x[2 * self.n_layers - 1 :]
@@ -165,6 +268,7 @@ class EarthModel:
         return numpy.append(thickness, 1.0), velocity_p, velocity_s, density
 
     def _misfit_function(self, x, curves):
+        """Misfit function to minimize."""
         thickness, velocity_p, velocity_s, density = self.transform(x)
         misfit = self._configuration["misfit"]
         normalize_weights = self._configuration["normalize_weights"]
@@ -233,6 +337,7 @@ class EarthModel:
         return error + error_extra
 
     def _get_density(self, velocity_p):
+        """Get density for each layer."""
         try:
             return numpy.array([self._configuration["density"](vp) for vp in velocity_p])
 
@@ -241,12 +346,15 @@ class EarthModel:
 
     @staticmethod
     def _get_velocity_p(velocity_s, poisson):
+        """Get P-wave velocity."""
         return velocity_s * ((1.0 - poisson) / (0.5 - poisson)) ** 0.5
 
     @property
     def layers(self):
+        """Return layers in model."""
         return self._layers
 
     @property
     def n_layers(self):
+        """Return number of layers."""
         return len(self._layers)

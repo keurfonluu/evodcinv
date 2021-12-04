@@ -5,6 +5,7 @@ from progress.bar import IncrementalBar
 
 class ProgressBar(IncrementalBar):
     def __init__(self, *args, **kwargs):
+        """Custom progress bar with misfit information."""
         super().__init__(*args, **kwargs)
         
         self.width = 20
@@ -14,6 +15,7 @@ class ProgressBar(IncrementalBar):
 
     @property
     def misfit(self):
+        """Return misfit value.""" 
         return self._misfit
 
     @misfit.setter
