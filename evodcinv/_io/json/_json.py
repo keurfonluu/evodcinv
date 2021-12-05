@@ -6,6 +6,20 @@ from ..._result import InversionResult
 
 
 def read(filename):
+    """
+    Import json file with inversion results.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+
+    Returns
+    -------
+    :class:`evodcinv.InversionResult`
+        Inversion results.
+
+    """
     with open(filename, "r") as f:
         result = json.load(f)
 
@@ -15,6 +29,19 @@ def read(filename):
 
 
 def write(filename, result, indent=None):
+    """
+    Export inversion results to json.
+
+    Parameters
+    ----------
+    filename : str
+        Output file name.
+    result : :class:`evodcinv.InversionResult`
+        Inversion results to export.
+    indent : int, str or None, optional, default None
+        Indent level.
+
+    """
     from copy import deepcopy
 
     def jsonify(x):

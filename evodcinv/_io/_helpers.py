@@ -33,6 +33,22 @@ def register(file_format, extensions, reader, writer=None):
 
 
 def read(filename, file_format=None, **kwargs):
+    """
+    Read inversion results.
+
+    Parameters
+    ----------
+    filename : str
+        Input file name.
+    file_format : str ('h5', 'json') or None, optional, default None
+        Input file format.
+
+    Returns
+    -------
+    :class:`evodcinv.InversionResult`
+        Inversion results.
+
+    """
     if not isinstance(filename, str):
         raise TypeError()
 
@@ -47,6 +63,26 @@ def read(filename, file_format=None, **kwargs):
 
 
 def write(filename, result, file_format=None, **kwargs):
+    """
+    Write TOUGH input file.
+
+    Parameters
+    ----------
+    filename : str
+        Output file name.
+    result : :class:`evodcinv.InversionResult`
+        Inversion results to export.
+    file_format : str ('h5', 'json') or None, optional, default None
+        Output file format.
+
+    Other Parameters
+    ----------------
+    compression_opts : int, optional, default 4
+        Only if ``file_format = "h5"``. Compression level for gzip compression. May be an integer from 0 to 9.
+    indent : int, str or None, optional, default None
+        Only if ``file_format = "json"``. Indent level.
+
+    """
     if not isinstance(filename, str):
         raise TypeError()
     
