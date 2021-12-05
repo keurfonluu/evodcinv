@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from disba import depthplot, resample, surf96, Ellipticity
+from disba import Ellipticity, depthplot, resample, surf96
 from disba._common import ifunc
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Normalize
@@ -86,7 +86,7 @@ class InversionResult(dict):
             Maximum layer thickness (in km).
         zmax : scalar or None, optional, default None
             Depth of last data point.
-        
+
         """
 
         def profile(thickness, parameter, z):
@@ -104,13 +104,14 @@ class InversionResult(dict):
         nz = np.ceil(zmax / dz).astype(int)
         z = dz * np.arange(nz)
 
-        mean_model = np.column_stack([
-            np.average(
-                [profile(model[:, 0], model[:, i + 1], z) for model in models],
-                axis=0,
-                weights=1.0 / misfits,
-            )
-            for i in range(3)
+        mean_model = np.column_stack(
+            [
+                np.average(
+                    [profile(model[:, 0], model[:, i + 1], z) for model in models],
+                    axis=0,
+                    weights=1.0 / misfits,
+                )
+                for i in range(3)
             ]
         )
         d = np.full_like(z, dz)
@@ -158,7 +159,7 @@ class InversionResult(dict):
             A dictionary of options to pass to plotting function.
         ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
             Matplotlib axes. If `None`, use current axes.
-        
+
         """
         from joblib import Parallel, delayed
 
@@ -168,6 +169,7 @@ class InversionResult(dict):
             raise ValueError()
 
         if type in {"phase", "group"}:
+
             def get_y(thickness, velocity_p, velocity_s, density):
                 c = surf96(
                     period,
@@ -186,14 +188,10 @@ class InversionResult(dict):
                 return c[idx]
 
         else:
+
             def get_y(thickness, velocity_p, velocity_s, density):
                 ell = Ellipticity(
-                    thickness,
-                    velocity_p,
-                    velocity_s,
-                    density,
-                    "dunkin",
-                    dc,
+                    thickness, velocity_p, velocity_s, density, "dunkin", dc,
                 )
                 rel = ell(period, mode)
 
@@ -241,14 +239,16 @@ class InversionResult(dict):
             smap.set_array([])
 
             # Generate and plot curves
-            curves = Parallel(n_jobs=n_jobs)(delayed(get_y)(*model.T) for model in models)
+            curves = Parallel(n_jobs=n_jobs)(
+                delayed(get_y)(*model.T) for model in models
+            )
             for curve, misfit in zip(curves, misfits):
                 y = (
                     1.0 / curve
                     if "type" != "ellipticity" and yaxis == "slowness"
                     else curve
                 )
-                plot(x[:len(y)], y, color=smap.to_rgba(misfit), **_plot_args)
+                plot(x[: len(y)], y, color=smap.to_rgba(misfit), **_plot_args)
 
         elif show == "best":
             curve = get_y(*self.model.T)
@@ -257,7 +257,7 @@ class InversionResult(dict):
                 if "type" != "ellipticity" and yaxis == "slowness"
                 else curve
             )
-            plot(x[:len(y)], y, **_plot_args)
+            plot(x[: len(y)], y, **_plot_args)
 
         # Customize axes
         gca = ax if ax is not None else plt.gca()
@@ -272,7 +272,16 @@ class InversionResult(dict):
         gca.xaxis.set_major_formatter(ScalarFormatter())
         gca.xaxis.set_minor_formatter(ScalarFormatter())
 
-    def plot_model(self, parameter, zmax=None, show="best", stride=1, dz=None, plot_args=None, ax=None):
+    def plot_model(
+        self,
+        parameter,
+        zmax=None,
+        show="best",
+        stride=1,
+        dz=None,
+        plot_args=None,
+        ax=None,
+    ):
         """
         Plot model parameter as a function of depth.
 
@@ -350,11 +359,7 @@ class InversionResult(dict):
                 depthplot(model[:, 0], model[:, i], zmax, plot_args=tmp, ax=ax)
 
         else:
-            model = (
-                self.model
-                if show == "best"
-                else self.mean(dz, zmax)
-            )
+            model = self.model if show == "best" else self.mean(dz, zmax)
             depthplot(model[:, 0], model[:, i], zmax, plot_args=_plot_args, ax=ax)
 
         # Customize axes
@@ -386,10 +391,12 @@ class InversionResult(dict):
             A dictionary of options to pass to plotting function.
         ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
             Matplotlib axes. If `None`, use current axes.
-        
+
         """
         maxiter = self.maxiter if self.n_runs > 1 else [self.maxiter]
-        global_misfits = self.global_misfits if self.n_runs > 1 else [self.global_misfits]
+        global_misfits = (
+            self.global_misfits if self.n_runs > 1 else [self.global_misfits]
+        )
 
         if not (run in {"all"} or (isinstance(run, int) and run > 0)):
             raise ValueError()
@@ -432,18 +439,14 @@ class InversionResult(dict):
         ----------
         value : scalar or None, optional, default None
             Single value to be used for the data threshold. If None, remove invalid models (i.e., with misfit equal to Inf).
-        
+
         Returns
         -------
         :class:`evodcinv.InversionResult`
             Inversion results with models that satisfy the threshold criterion.
 
         """
-        idx = (
-            ~np.isinf(self.misfits)
-            if value is None
-            else self.misfits <= value
-        )
+        idx = ~np.isinf(self.misfits) if value is None else self.misfits <= value
 
         return InversionResult(
             xs=self.xs,
@@ -464,7 +467,7 @@ class InversionResult(dict):
             Output file name.
         file_format : str {'h5', 'json'} or None, optional, default None
             Output file format.
-        
+
         """
         from ._io import write
 
@@ -488,8 +491,4 @@ class InversionResult(dict):
     @property
     def n_runs(self):
         """Return number of runs."""
-        return (
-            len(self.maxiter)
-            if np.ndim(self.maxiter)
-            else 1
-        )
+        return len(self.maxiter) if np.ndim(self.maxiter) else 1

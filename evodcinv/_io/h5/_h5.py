@@ -1,5 +1,4 @@
 import h5py
-
 import numpy as np
 
 from ..._result import InversionResult

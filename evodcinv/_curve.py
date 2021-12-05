@@ -3,7 +3,16 @@ from disba._helpers import is_sorted
 
 
 class Curve:
-    def __init__(self, period, data, mode=0, wave="rayleigh", type="phase", weight=1.0, uncertainties=None):
+    def __init__(
+        self,
+        period,
+        data,
+        mode=0,
+        wave="rayleigh",
+        type="phase",
+        weight=1.0,
+        uncertainties=None,
+    ):
         """
         Curve data class.
 
@@ -82,9 +91,17 @@ class Curve:
 
         if inplace:
             self._data = new_data
-            
+
         else:
-            return Curve(new_period, new_data, self.mode, self.wave, self.type, self.weight, self.uncertainties)
+            return Curve(
+                new_period,
+                new_data,
+                self.mode,
+                self.wave,
+                self.type,
+                self.weight,
+                self.uncertainties,
+            )
 
     @property
     def period(self):

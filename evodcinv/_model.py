@@ -4,11 +4,11 @@ from disba._common import ifunc
 from stochopy.optimize import minimize
 
 from ._common import itype
-from ._helpers import nafe_drake
-from ._result import InversionResult
-from ._progress import ProgressBar
 from ._curve import Curve
+from ._helpers import nafe_drake
 from ._layer import Layer
+from ._progress import ProgressBar
+from ._result import InversionResult
 
 
 class EarthModel:
@@ -24,12 +24,12 @@ class EarthModel:
     def add(self, layer):
         """
         Add a new layer.
-        
+
         Parameters
         ----------
         layer : :class:`evodcinv.Layer`
             Layer to add.
-        
+
         """
         if not isinstance(layer, Layer):
             raise TypeError()
@@ -44,14 +44,24 @@ class EarthModel:
         -------
         :class:`evodcinv.Layer`
             Last layer.
-        
+
         """
         if not self.n_layers:
             raise ValueError()
 
         return self.layers.pop(-1)
 
-    def configure(self, optimizer="cpso", misfit="rmse", density="nafe-drake", normalize_weights=True, extra_terms=None, dc=0.001, dt=0.01, optimizer_args=None):
+    def configure(
+        self,
+        optimizer="cpso",
+        misfit="rmse",
+        density="nafe-drake",
+        normalize_weights=True,
+        extra_terms=None,
+        dc=0.001,
+        dt=0.01,
+        optimizer_args=None,
+    ):
         """
         Configure misfit function to minimize.
 
@@ -93,9 +103,9 @@ class EarthModel:
              - maxiter (int): maximum number of iterations to perform
              - popsize (int): total population size
              - seed (int or None): seed for random number generator
-            
+
             See :mod:`stochopy`'s documentation for more options.
-        
+
         """
         if optimizer not in {"cmaes", "cpso", "de", "na", "pso", "vdcma"}:
             raise ValueError()
@@ -217,19 +227,24 @@ class EarthModel:
         for i in range(maxrun):
             prefix = f"Run {i + 1:<{len(str(maxiter)) - 1}d}"
             with ProgressBar(prefix, max=maxiter) as bar:
+
                 def callback(X, res):
                     bar.misfit = res.fun
                     bar.next()
 
-                x = minimize(func, bounds, method=method, options=_optimizer_args, callback=callback)
+                x = minimize(
+                    func,
+                    bounds,
+                    method=method,
+                    options=_optimizer_args,
+                    callback=callback,
+                )
 
             # Parse output
             velocity_models = np.empty((maxiter, popsize, self.n_layers, 4))
             for i in range(x.nit):
                 for j in range(popsize):
-                    velocity_models[i, j] = np.transpose(
-                        self.transform(x.xall[i, j])
-                    )
+                    velocity_models[i, j] = np.transpose(self.transform(x.xall[i, j]))
 
             result = InversionResult(
                 xs=np.concatenate(x.xall),
@@ -270,7 +285,7 @@ class EarthModel:
             Layer S-wave velocity.
         array_like
             Layer density.
-        
+
         """
         thickness = x[: self.n_layers - 1]
         velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1]
@@ -319,11 +334,7 @@ class EarthModel:
 
                 else:
                     ell = Ellipticity(
-                        thickness,
-                        velocity_p,
-                        velocity_s,
-                        density,
-                        dc=dc,
+                        thickness, velocity_p, velocity_s, density, dc=dc,
                     )
                     rel = ell(curve.period, mode=curve.mode)
                     dcalc = np.abs(rel.ellipticity)

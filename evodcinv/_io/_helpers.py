@@ -1,6 +1,5 @@
 import os
 
-
 _extension_to_filetype = {}
 _reader_map = {}
 _writer_map = {}
@@ -85,7 +84,7 @@ def write(filename, result, file_format=None, **kwargs):
     """
     if not isinstance(filename, str):
         raise TypeError()
-    
+
     if file_format is None:
         file_format = filetype_from_filename(filename, _extension_to_filetype)
 
