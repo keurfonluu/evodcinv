@@ -125,7 +125,8 @@ class InversionResult(dict):
         show="best",
         stride=1,
         n_jobs=-1,
-        disba_args=None,
+        dc=0.001,
+        dt=0.01,
         plot_args=None,
         ax=None,
     ):
@@ -148,8 +149,10 @@ class InversionResult(dict):
             Number of models to skip.
         n_jobs : int, optional, default -1
             Number of CPU cores to calculate data curves in parallel. Supply -1 to use all available CPU cores. Only used if ``show == 'all'``.
-        disba_args : dict or None, optional, default None
-            A dictionary of options to pass to :mod:`disba`.
+        dc : scalar, optional, default 0.001
+            Phase velocity increment for root finding.
+        dt : scalar, optional, default 0.01
+            Frequency increment (%) for calculating group velocity.
         plot_args : dict or None, optional, default None
             A dictionary of options to pass to plotting function.
         ax : :class:`matplotlib.pyplot.Axes` or None, optional, default None
@@ -161,19 +164,6 @@ class InversionResult(dict):
         assert type in {"phase", "group", "ellipticity"}
         assert show in {"best", "all"}
 
-        # disba arguments
-        disba_args = disba_args if disba_args is not None else {}
-        _disba_args = {
-            "algorithm": "dunkin",
-            "dc": 0.001,
-            "dt": 0.01,
-        }
-        _disba_args.update(disba_args)
-
-        algorithm = _disba_args.pop("algorithm")
-        dc = _disba_args.pop("dc")
-        dt = _disba_args.pop("dt")
-
         if type in {"phase", "group"}:
             def get_y(thickness, velocity_p, velocity_s, density):
                 c = surf96(
@@ -184,7 +174,7 @@ class InversionResult(dict):
                     density,
                     mode,
                     itype[type],
-                    ifunc[algorithm][wave],
+                    ifunc["dunkin"][wave],
                     dc,
                     dt,
                 )
@@ -199,7 +189,7 @@ class InversionResult(dict):
                     velocity_p,
                     velocity_s,
                     density,
-                    algorithm,
+                    "dunkin",
                     dc,
                 )
                 rel = ell(period, mode)
