@@ -81,9 +81,9 @@ class EarthModel:
             If `True`, weights associated to individual misfit terms are normalized.
         extra_terms : sequence of callable, optional, default True
             Additional misfit terms. Must be a sequence of callables.
-        dc : scalar, optional, default 0.005
+        dc : scalar, optional, default 0.001
             Phase velocity increment for root finding.
-        dt : scalar, optional, default 0.025
+        dt : scalar, optional, default 0.01
             Frequency increment (%) for calculating group velocity.
         optimizer_args : dict, optional, default None
             A dictionary of solver options. All methods accept the following generic options:
