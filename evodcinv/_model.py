@@ -1,5 +1,4 @@
-from typing import Type
-import numpy
+import numpy as np
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
@@ -122,13 +121,13 @@ class EarthModel:
 
         # Misfit type
         if misfit == "norm1":
-            misfit = lambda x: numpy.abs(x).sum()
+            misfit = lambda x: np.abs(x).sum()
 
         elif misfit == "norm2":
-            misfit = lambda x: numpy.square(x).sum()
+            misfit = lambda x: np.square(x).sum()
 
         elif misfit == "rmse":
-            misfit = lambda x: (numpy.square(x).sum() / len(x)) ** 0.5
+            misfit = lambda x: (np.square(x).sum() / len(x)) ** 0.5
 
         # Density function
         if density == "nafe-drake":
@@ -202,11 +201,11 @@ class EarthModel:
         # Set random seed
         seed = _optimizer_args.pop("seed")
         if seed is not None:
-            numpy.random.seed(seed)
+            np.random.seed(seed)
 
         # Minimize misfit function
         func = lambda x: self._misfit_function(x, curves)
-        bounds = numpy.vstack(
+        bounds = np.vstack(
             [
                 [layer.thickness for layer in self._layers[:-1]],
                 [layer.velocity_s for layer in self._layers],
@@ -225,18 +224,18 @@ class EarthModel:
                 x = minimize(func, bounds, method=method, options=_optimizer_args, callback=callback)
 
             # Parse output
-            velocity_models = numpy.empty((maxiter, popsize, self.n_layers, 4))
+            velocity_models = np.empty((maxiter, popsize, self.n_layers, 4))
             for i in range(x.nit):
                 for j in range(popsize):
-                    velocity_models[i, j] = numpy.transpose(
+                    velocity_models[i, j] = np.transpose(
                         self.transform(x.xall[i, j])
                     )
 
             result = InversionResult(
-                xs=numpy.concatenate(x.xall),
-                models=numpy.concatenate(velocity_models),
-                misfits=numpy.concatenate(x.funall),
-                global_misfits=numpy.minimum.accumulate(x.funall.min(axis=1)),
+                xs=np.concatenate(x.xall),
+                models=np.concatenate(velocity_models),
+                misfits=np.concatenate(x.funall),
+                global_misfits=np.minimum.accumulate(x.funall.min(axis=1)),
                 maxiter=maxiter,
                 popsize=popsize,
             )
@@ -279,7 +278,7 @@ class EarthModel:
         velocity_p = self._get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
 
-        return numpy.append(thickness, 1.0), velocity_p, velocity_s, density
+        return np.append(thickness, 1.0), velocity_p, velocity_s, density
 
     def _misfit_function(self, x, curves):
         """Misfit function to minimize."""
@@ -295,8 +294,8 @@ class EarthModel:
             for extra_term in extra_terms:
                 error_extra += extra_term(x)
 
-            if numpy.isinf(error_extra):
-                return numpy.Inf
+            if np.isinf(error_extra):
+                return np.Inf
 
         error = 0.0
         weights_sum = 0.0
@@ -327,7 +326,7 @@ class EarthModel:
                         dc=dc,
                     )
                     rel = ell(curve.period, mode=curve.mode)
-                    dcalc = numpy.abs(rel.ellipticity)
+                    dcalc = np.abs(rel.ellipticity)
 
                 n = len(dcalc)
                 if n > 0:
@@ -340,10 +339,10 @@ class EarthModel:
                     weights_sum += curve.weight
 
                 else:
-                    return numpy.Inf
+                    return np.Inf
 
             except DispersionError:
-                return numpy.Inf
+                return np.Inf
 
         if normalize_weights:
             error /= weights_sum
@@ -353,7 +352,7 @@ class EarthModel:
     def _get_density(self, velocity_p):
         """Get density for each layer."""
         try:
-            return numpy.array([self._configuration["density"](vp) for vp in velocity_p])
+            return np.array([self._configuration["density"](vp) for vp in velocity_p])
 
         except KeyError:
             raise RuntimeError("model is not configured")

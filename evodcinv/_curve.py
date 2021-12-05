@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 from disba._helpers import is_sorted
 
 
@@ -36,8 +36,8 @@ class Curve:
         if not is_sorted(period):
             raise ValueError()
 
-        self._period = numpy.asarray(period)
-        self._data = numpy.asarray(data)
+        self._period = np.asarray(period)
+        self._data = np.asarray(data)
         self._mode = mode
         self._wave = wave
         self._type = type
@@ -61,13 +61,13 @@ class Curve:
             New data curve (only if ``inplace == False``).
 
         """
-        if numpy.ndim(new_period) == 0:
+        if np.ndim(new_period) == 0:
             if not isinstance(new_period, int):
                 raise TypeError()
 
-            new_period = numpy.linspace(self.period[0], self.period[-1], new_period)
+            new_period = np.linspace(self.period[0], self.period[-1], new_period)
 
-        elif numpy.ndim(new_period) == 1:
+        elif np.ndim(new_period) == 1:
             if not is_sorted(new_period):
                 raise ValueError()
             if new_period[0] < self.period[0]:
@@ -78,7 +78,7 @@ class Curve:
         else:
             raise ValueError()
 
-        new_data = numpy.interp(new_period, self.period, self.data)
+        new_data = np.interp(new_period, self.period, self.data)
 
         if inplace:
             self._data = new_data

@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 from disba import depthplot, resample, surf96, Ellipticity
 from disba._common import ifunc
 from matplotlib.cm import ScalarMappable
@@ -56,10 +56,10 @@ class InversionResult(dict):
 
         else:
             return InversionResult(
-                xs=numpy.vstack([self.xs, other.xs]),
-                models=numpy.vstack([self.models, other.models]),
-                misfits=numpy.concatenate([self.misfits, other.misfits]),
-                global_misfits=numpy.row_stack(
+                xs=np.vstack([self.xs, other.xs]),
+                models=np.vstack([self.models, other.models]),
+                misfits=np.concatenate([self.misfits, other.misfits]),
+                global_misfits=np.row_stack(
                     (self.global_misfits, other.global_misfits)
                 ),
                 maxiter=(
@@ -94,18 +94,18 @@ class InversionResult(dict):
             zp, fp = resample(thickness, parameter, dz)
             zp = zp.cumsum()
 
-            return numpy.interp(z, zp, fp)
+            return np.interp(z, zp, fp)
 
         models = self.models
         misfits = self.misfits
 
         if zmax is None:
-            zmax = numpy.max([model[:-1, 0].sum() for model in models])
-        nz = numpy.ceil(zmax / dz).astype(int)
-        z = dz * numpy.arange(nz)
+            zmax = np.max([model[:-1, 0].sum() for model in models])
+        nz = np.ceil(zmax / dz).astype(int)
+        z = dz * np.arange(nz)
 
-        mean_model = numpy.column_stack([
-            numpy.average(
+        mean_model = np.column_stack([
+            np.average(
                 [profile(model[:, 0], model[:, i + 1], z) for model in models],
                 axis=0,
                 weights=1.0 / misfits,
@@ -113,9 +113,9 @@ class InversionResult(dict):
             for i in range(3)
             ]
         )
-        d = numpy.full_like(z, dz)
+        d = np.full_like(z, dz)
 
-        return numpy.column_stack((d, mean_model))
+        return np.column_stack((d, mean_model))
 
     def plot_curve(
         self,
@@ -197,7 +197,7 @@ class InversionResult(dict):
                 )
                 rel = ell(period, mode)
 
-                return numpy.abs(rel.ellipticity)
+                return np.abs(rel.ellipticity)
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
@@ -227,7 +227,7 @@ class InversionResult(dict):
 
         if show == "all":
             # Sort models
-            idx = numpy.argsort(self.misfits)[::-1]
+            idx = np.argsort(self.misfits)[::-1]
             models = self.models[idx]
             misfits = self.misfits[idx]
 
@@ -330,7 +330,7 @@ class InversionResult(dict):
 
         if show == "all":
             # Sort models
-            idx = numpy.argsort(self.misfits)[::-1]
+            idx = np.argsort(self.misfits)[::-1]
             models = self.models[idx]
             misfits = self.misfits[idx]
 
@@ -408,10 +408,10 @@ class InversionResult(dict):
         plot = getattr(plt if ax is None else ax, "plot")
         if run == "all":
             for n, misfits in zip(maxiter, global_misfits):
-                plot(numpy.arange(n) + 1, misfits, **_plot_args)
+                plot(np.arange(n) + 1, misfits, **_plot_args)
 
         else:
-            plot(numpy.arange(maxiter[run - 1]) + 1, global_misfits[run - 1], **_plot_args)
+            plot(np.arange(maxiter[run - 1]) + 1, global_misfits[run - 1], **_plot_args)
 
         # Customize axes
         gca = ax if ax is not None else plt.gca()
@@ -419,7 +419,7 @@ class InversionResult(dict):
         gca.set_xlabel("Iteration")
         gca.set_ylabel("Misfit value")
 
-        xmax = numpy.max(maxiter) if run == "all" else maxiter[run - 1]
+        xmax = np.max(maxiter) if run == "all" else maxiter[run - 1]
         gca.set_xlim(1, xmax)
 
     def threshold(self, value=None):
@@ -440,7 +440,7 @@ class InversionResult(dict):
 
         """
         idx = (
-            ~numpy.isinf(self.misfits)
+            ~np.isinf(self.misfits)
             if value is None
             else self.misfits <= value
         )
@@ -490,6 +490,6 @@ class InversionResult(dict):
         """Return number of runs."""
         return (
             len(self.maxiter)
-            if numpy.ndim(self.maxiter)
+            if np.ndim(self.maxiter)
             else 1
         )

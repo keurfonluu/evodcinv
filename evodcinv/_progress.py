@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 from progress.bar import IncrementalBar
 
@@ -11,7 +11,7 @@ class ProgressBar(IncrementalBar):
         self.width = 20
         self.suffix = "%(percent)3d%% [%(elapsed_td)s / %(eta_td)s] - Misfit: %(misfit).4f"
         self.check_tty = False
-        self.misfit = numpy.Inf
+        self.misfit = np.Inf
 
     @property
     def misfit(self):
