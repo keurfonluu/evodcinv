@@ -148,7 +148,7 @@ class InversionResult(dict):
         stride : int, optional, default 1
             Number of models to skip.
         n_jobs : int, optional, default -1
-            Number of CPU cores to calculate data curves in parallel. Supply -1 to use all available CPU cores. Only used if ``show == 'all'``.
+            Number of CPU cores to calculate data curves in parallel. Supply -1 to use all available CPU cores. Only used if ``show = "all"``.
         dc : scalar, optional, default 0.001
             Phase velocity increment for root finding.
         dt : scalar, optional, default 0.01
