@@ -45,7 +45,8 @@ class InversionResult(dict):
 
     def __add__(self, other):
         """Concatenate inversion results."""
-        assert isinstance(other, InversionResult)
+        if not isinstance(other, InversionResult):
+            raise TypeError()
 
         if not self.keys():
             return InversionResult(**other)
@@ -161,8 +162,10 @@ class InversionResult(dict):
         """
         from joblib import Parallel, delayed
 
-        assert type in {"phase", "group", "ellipticity"}
-        assert show in {"best", "all"}
+        if type not in {"phase", "group", "ellipticity"}:
+            raise ValueError()
+        if show not in {"best", "all"}:
+            raise ValueError()
 
         if type in {"phase", "group"}:
             def get_y(thickness, velocity_p, velocity_s, density):
@@ -211,9 +214,12 @@ class InversionResult(dict):
         yaxis = _plot_args.pop("yaxis")
         cmap = _plot_args.pop("cmap")
 
-        assert plot_type in {"line", "loglog", "semilogx", "semilogy"}
-        assert xaxis in {"frequency", "period"}
-        assert yaxis in {"slowness", "velocity"}
+        if plot_type not in {"line", "loglog", "semilogx", "semilogy"}:
+            raise ValueError()
+        if xaxis not in {"frequency", "period"}:
+            raise ValueError()
+        if yaxis not in {"slowness", "velocity"}:
+            raise ValueError()
 
         plot_type = plot_type if plot_type != "line" else "plot"
         plot = getattr(plt if ax is None else ax, plot_type)
@@ -285,7 +291,7 @@ class InversionResult(dict):
             Model to plot.
         stride : int, optional, default 1
             Number of models to skip.
-        dz : scalar
+        dz : scalar or None, optional, default None
             Maximum layer thickness (in km).
         plot_args : dict or None, optional, default None
             A dictionary of options to pass to plotting function.
@@ -301,10 +307,12 @@ class InversionResult(dict):
             "vs": 2,
             "rho": 3,
         }
-        assert parameter in parameters
-        assert show in {"best", "mean", "all"}
-        if show == "mean":
-            assert dz is not None
+        if parameter not in parameters:
+            raise ValueError()
+        if show not in {"best", "mean", "all"}:
+            raise ValueError()
+        if show == "mean" and dz is None:
+            raise ValueError()
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}
@@ -383,9 +391,11 @@ class InversionResult(dict):
         maxiter = self.maxiter if self.n_runs > 1 else [self.maxiter]
         global_misfits = self.global_misfits if self.n_runs > 1 else [self.global_misfits]
 
-        assert run in {"all"} or (isinstance(run, int) and run > 0)
+        if not (run in {"all"} or (isinstance(run, int) and run > 0)):
+            raise ValueError()
         if isinstance(run, int) and run > 1:
-            assert run <= self.n_runs
+            if run > self.n_runs:
+                raise ValueError()
 
         # Plot arguments
         plot_args = plot_args if plot_args is not None else {}

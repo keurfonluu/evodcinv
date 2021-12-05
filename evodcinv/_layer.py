@@ -15,8 +15,10 @@ class Layer:
         """
         poisson = poisson if poisson is not None else [0.2, 0.4]
         for arg in (thickness, velocity_s, poisson):
-            assert len(arg) == 2
-            assert arg[0] <= arg[1]
+            if len(arg) != 2:
+                raise ValueError()
+            if arg[0] > arg[1]:
+                raise ValueError()
 
         self._thickness = tuple(thickness)
         self._velocity_s = tuple(velocity_s)

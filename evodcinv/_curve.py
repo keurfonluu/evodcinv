@@ -25,11 +25,16 @@ class Curve:
             Uncertainties associated to data points. If None, error will be normalized by `data`.
 
         """
-        assert len(period) == len(data)
-        assert mode >= 0
-        assert wave in {"rayleigh", "love"}
-        assert type in {"phase", "group", "ellipticity"}
-        assert is_sorted(period)
+        if len(period) != len(data):
+            raise ValueError()
+        if mode < 0:
+            raise ValueError()
+        if wave not in {"rayleigh", "love"}:
+            raise ValueError()
+        if type not in {"phase", "group", "ellipticity"}:
+            raise ValueError()
+        if not is_sorted(period):
+            raise ValueError()
 
         self._period = numpy.asarray(period)
         self._data = numpy.asarray(data)
@@ -57,14 +62,18 @@ class Curve:
 
         """
         if numpy.ndim(new_period) == 0:
-            assert isinstance(new_period, int)
+            if not isinstance(new_period, int):
+                raise TypeError()
 
             new_period = numpy.linspace(self.period[0], self.period[-1], new_period)
 
         elif numpy.ndim(new_period) == 1:
-            assert is_sorted(new_period)
-            assert new_period[0] >= self.period[0]
-            assert new_period[-1] <= self.period[-1]
+            if not is_sorted(new_period):
+                raise ValueError()
+            if new_period[0] < self.period[0]:
+                raise ValueError()
+            if new_period[-1] > self.period[-1]:
+                raise ValueError()
 
         else:
             raise ValueError()

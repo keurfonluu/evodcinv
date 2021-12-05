@@ -1,3 +1,4 @@
+from typing import Type
 import numpy
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
@@ -31,7 +32,8 @@ class EarthModel:
             Layer to add.
         
         """
-        assert isinstance(layer, Layer)
+        if not isinstance(layer, Layer):
+            raise TypeError()
 
         self.layers.append(layer)
 
@@ -45,7 +47,8 @@ class EarthModel:
             Last layer.
         
         """
-        assert self.n_layers
+        if not self.n_layers:
+            raise ValueError()
 
         return self.layers.pop(-1)
 
@@ -95,19 +98,27 @@ class EarthModel:
             See :mod:`stochopy`'s documentation for more options.
         
         """
-        assert optimizer in {"cmaes", "cpso", "de", "na", "pso", "vdcma"}
-        assert misfit in {"norm1", "norm2", "rmse"} or hasattr(misfit, "__call__")
-        assert density in {"nafe-drake"} or hasattr(density, "__call__")
-        assert dc > 0.0
-        assert dt > 0.0
+        if optimizer not in {"cmaes", "cpso", "de", "na", "pso", "vdcma"}:
+            raise ValueError()
+        if not (misfit in {"norm1", "norm2", "rmse"} or hasattr(misfit, "__call__")):
+            raise ValueError()
+        if not ({"nafe-drake"} or hasattr(density, "__call__")):
+            raise ValueError()
+        if dc <= 0.0:
+            raise ValueError()
+        if dt <= 0.0:
+            raise ValueError()
 
         optimizer_args = optimizer_args if optimizer_args is not None else {}
-        assert isinstance(optimizer_args, dict)
+        if not isinstance(optimizer_args, dict):
+            raise TypeError()
 
         extra_terms = extra_terms if extra_terms is not None else []
-        assert isinstance(extra_terms, (list, tuple))
+        if not isinstance(extra_terms, (list, tuple)):
+            raise TypeError()
         for extra_term in extra_terms:
-            assert hasattr(extra_term, "__call__")
+            if not hasattr(extra_term, "__call__"):
+                raise ValueError()
 
         # Misfit type
         if misfit == "norm1":
@@ -153,10 +164,13 @@ class EarthModel:
             Inversion results.
 
         """
-        assert self._configuration
-        assert isinstance(curves, (list, tuple))
+        if not self._configuration:
+            raise ValueError()
+        if not isinstance(curves, (list, tuple)):
+            raise TypeError()
         for curve in curves:
-            assert isinstance(curve, Curve)
+            if not isinstance(curve, Curve):
+                raise TypeError()
 
         # Optimizer arguments
         method = self._configuration["optimizer"]
