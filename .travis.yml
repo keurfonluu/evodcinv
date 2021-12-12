@@ -1,0 +1,20 @@
+dist: xenial
+
+language: python
+python:
+  - 3.8
+
+env:
+  global:
+    # Doctr deploy key for keurfonluu/evodcinv
+    - secure: "RMkTT3IhGOiOi5Oq/bsq91Sm28ZDZ0Y7fVxOVMkQ4pZZ+wKgMhJESKVcHIFsKDe0Bjx+yESxjvdSGOG8a/cgUhOUYxfp1LZcLzLs3ZlzteKHiAj2VAqHhloW11axks/LKTeXzAFc8I3BvIn/czaO7PDft9t2ytRHWCtBFMb+OAkbVhf1t/oGJtYM+7LIqvMcqKk2oDvCKsDPDv9lARDr9yhtCeJgcPsPezHnyBkQev4LPVodaoauvaWBZLisNXOEPkjv9z7+6AZ3wVNKQzeYPs9PK4p5Z2NFZpPyk1IKMYFRjfIIJ/bGimyybIniiRjgOogVCV8cWF92wVFggxjerswO2XrF9hXbkCtQyDWJrsEDc4a0wMI13M20uWeAf9q0O931ranfeZT+yOh/c8yw11FxqvOcN3ijBtwG9Y3Ap2GF7u8ILeHJ+AzQlEty5RrTB1FKQwH8PhX4tqbj7f0mSBT3mNxtPVEWf+DvcCAlgHm6/OIG+zyJeZgjkrKDQrSvVjxmHng+oKOvCHTCjTuAiBXFCBDvs6aZMYzAtBbyAA2x8asZb++FYvBZl+317wVZmT92ZPX8qpmPutKebTQekXroO2UsxZVcTdgs1mSk4SUBlWy6GjF5tn3X2dKVGyoS3ykspK0AoqcfmobXhgethYdmZmfn4lGg0oYsV91PQOk="
+
+install:
+  - pip install .
+  - pip install -r doc/requirements.txt
+
+script:
+  - set -e
+  - sphinx-build -b html doc/source doc/build
+  - pip install doctr
+  - doctr deploy . --built-docs ./doc/build/
