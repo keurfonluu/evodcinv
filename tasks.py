@@ -46,7 +46,7 @@ def clean(c, bytecode=False):
 @task
 def black(c):
     c.run("black -t py36 evodcinv")
-    # c.run("black -t py36 test")
+    c.run("black -t py36 test")
 
 
 @task
@@ -57,7 +57,7 @@ def docstring(c):
 @task
 def isort(c):
     c.run("isort evodcinv")
-    # c.run("isort test")
+    c.run("isort test")
 
 
 @task

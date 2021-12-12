@@ -326,7 +326,9 @@ class EarthModel:
         velocity_p = self._get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
 
-        return np.column_stack((np.append(thickness, 1.0), velocity_p, velocity_s, density))
+        return np.column_stack(
+            (np.append(thickness, 1.0), velocity_p, velocity_s, density)
+        )
 
     def _misfit_function(self, x, curves):
         """Misfit function to minimize."""
