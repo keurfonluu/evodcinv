@@ -42,7 +42,9 @@ class EarthModel:
             d_min, d_max = layer.thickness
             vs_min, vs_max = layer.velocity_s
             nu_min, nu_max = layer.poisson
-            out += [f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"]
+            out += [
+                f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"
+            ]
 
         out += [f"{60 * '-'}\n"]
 
