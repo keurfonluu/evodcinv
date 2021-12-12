@@ -1,7 +1,7 @@
 evodcinv
 ========
 
-|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Build| |Travis|
+|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Build| |Travis| |DOI|
 
 **evodcinv** is a Python library to invert surface wave dispersion data (e.g., phase velocity dispersion curves) for an isotropic layered velocity model using Evolutionary Algorithms. It relies on `stochopy <https://github.com/keurfonluu/stochopy>`__ for the evolutionary optimizers while forward modeling is heavy-lifted by `disba <https://github.com/keurfonluu/disba>`__.
 
@@ -142,6 +142,9 @@ Guidelines <https://github.com/keurfonluu/evodcinv/blob/master/CONTRIBUTING.rst>
 
 .. |Codecov| image:: https://img.shields.io/codecov/c/github/keurfonluu/evodcinv.svg?style=flat
    :target: https://codecov.io/gh/keurfonluu/evodcinv
+
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.5775193.svg?style=flat
+   :target: https://doi.org/10.5281/zenodo.5775193
 
 .. |Build| image:: https://img.shields.io/github/workflow/status/keurfonluu/evodcinv/Python%20package
    :target: https://github.com/keurfonluu/evodcinv
