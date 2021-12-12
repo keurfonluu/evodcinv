@@ -128,6 +128,7 @@ res.plot_curve(
         "label": "Best",
     },
 )
+ax[1].set_xlim(2.0, 20.0)
 ax[1].xaxis.set_major_formatter(ScalarFormatter())
 ax[1].xaxis.set_minor_formatter(ScalarFormatter())
 ax[1].legend(loc=1, frameon=False)
