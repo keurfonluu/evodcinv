@@ -53,6 +53,19 @@ class Curve:
         self._weight = weight
         self._uncertainties = uncertainties
 
+    def __repr__(self):
+        """Pretty curve."""
+        out = []
+        out += [f"{80 * '-'}"]
+        out += [f"{self.wave.capitalize()}-wave {self.type}"]
+        out[-1] += " velocity\n" if self.type != "ellipticity" else "\n"
+        out += [f"Number of data points: {self.data.size}"]
+        out += [f"Period bounds: [{self.period.min():.4f}, {self.period.max():.4f}] s"]
+        out += [f"Mode: {self.mode}"]
+        out += [f"{80 * '-'}"]
+
+        return "\n".join(out)
+
     def resample(self, new_period, inplace=False):
         """
         Resample curve.

@@ -24,6 +24,32 @@ class Layer:
         self._velocity_s = tuple(velocity_s)
         self._poisson = tuple(poisson)
 
+    def __repr__(self):
+        """Pretty layer."""
+        out = []
+
+        # Table header
+        out += [f"{80 * '-'}"]
+        out += ["Layer parameters\n"]
+
+        out += [f"{60 * '-'}"]
+        out += [f"{'d [km]'.rjust(20)}{'vs [km/s]'.rjust(20)}{'nu [-]'.rjust(20)}"]
+        out += [3 * f"{'min'.rjust(10)}{'max'.rjust(10)}"]
+
+        # Table
+        out += [f"{60 * '-'}"]
+
+        d_min, d_max = self.thickness
+        vs_min, vs_max = self.velocity_s
+        nu_min, nu_max = self.poisson
+        out += [f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"]
+
+        out += [f"{60 * '-'}"]
+
+        out += [f"{80 * '-'}"]
+
+        return "\n".join(out)
+
     @property
     def thickness(self):
         """Return layer thickness search boundary."""

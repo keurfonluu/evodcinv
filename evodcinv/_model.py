@@ -17,6 +17,43 @@ class EarthModel:
         self._layers = []
         self._configuration = {}
 
+    def __repr__(self):
+        """Pretty model."""
+        if not self.n_layers:
+            return self.__class__.__name__ + "()"
+
+        out = []
+
+        # Useful variables
+        n_layers = self.n_layers
+
+        # Table header
+        out += [f"{80 * '-'}"]
+        out += ["Earth model parameters\n"]
+
+        out += [f"{60 * '-'}"]
+        out += [f"{'d [km]'.rjust(20)}{'vs [km/s]'.rjust(20)}{'nu [-]'.rjust(20)}"]
+        out += [3 * f"{'min'.rjust(10)}{'max'.rjust(10)}"]
+
+        # Table
+        out += [f"{60 * '-'}"]
+
+        for layer in self.layers:
+            d_min, d_max = layer.thickness
+            vs_min, vs_max = layer.velocity_s
+            nu_min, nu_max = layer.poisson
+            out += [f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"]
+
+        out += [f"{60 * '-'}\n"]
+
+        # Misc
+        out += [f"Number of layers: {n_layers}"]
+        out += [f"Number of parameters: {n_layers * 3 - 1}"]
+
+        out += [f"{80 * '-'}"]
+
+        return "\n".join(out)
+
     def __len__(self):
         """Return number of layers in model."""
         return self.n_layers
