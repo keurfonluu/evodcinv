@@ -22,18 +22,51 @@ class InversionResult(dict):
 
     def __repr__(self):
         """Pretty result."""
-        if self.keys():
-            m = max(map(len, list(self.keys()))) + 1
-
-            return "\n".join(
-                [
-                    "misfit".rjust(m) + ": " + repr(self.misfit),
-                    "x".rjust(m) + ": " + repr(self.x),
-                    "model".rjust(m) + ": " + repr(self.model),
-                ]
-            )
-        else:
+        if not self.keys():
             return self.__class__.__name__ + "()"
+
+        out = []
+
+        # Useful variables
+        n_layers = len(self.model)
+        n_runs = self.n_runs
+        x = np.insert(self.x, n_layers - 1, 0.0).reshape((n_layers, 3), order="F")
+
+        # Table headers
+        out += [f"{80 * '-'}"]
+        out += [f"Best model out of {len(self)} models ({n_runs} {'run' if n_runs == 1 else 'runs'})\n"]
+
+        out += [f"{'Velocity model':<50}{'Model parameters'}"]
+        out += [f"{40 * '-'}{'':10}{30 * '-'}"]
+        out += [f"{'d'.rjust(10)}{'vp'.rjust(10)}{'vs'.rjust(10)}{'rho'.rjust(10)}{'':10}{'d'.rjust(10)}{'vs'.rjust(10)}{'nu'.rjust(10)}"]
+        out += [f"{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[km/s]'.rjust(10)}{'[g/cm3]'.rjust(10)}{'':10}{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[-]'.rjust(10)}"]
+
+        # Tables
+        out += [f"{40 * '-'}{'':10}{30 * '-'}"]
+
+        for i in range(n_layers):
+            # Velocity model
+            d, vp, vs, rho = self.model[i]
+            out += [f"{d:>10.4f}{vp:>10.4f}{vs:>10.4f}{rho:>10.4f}"]
+
+            # Model parameters
+            d, vs, nu = x[i]
+            if i < n_layers - 1:
+                out[-1] += f"{'':10}{d:>10.4f}{vs:>10.4f}{nu:>10.4f}"
+
+            else:
+                out[-1] += f"{'':10}{'-':>10}{vs:>10.4f}{nu:>10.4f}"
+
+        out += [f"{40 * '-'}{'':10}{30 * '-'}\n"]
+
+        # Misc
+        out += [f"Number of layers: {n_layers}"]
+        out += [f"Number of parameters: {n_layers * 3 - 1}"]
+        out += [f"Best model misfit: {self.misfit:>.4f}"]
+        
+        out += [f"{80 * '-'}"]
+
+        return "\n".join(out)
 
     def __dir__(self):
         """Return a list of attributes."""
