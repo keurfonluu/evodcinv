@@ -34,12 +34,18 @@ class InversionResult(dict):
 
         # Table headers
         out += [f"{80 * '-'}"]
-        out += [f"Best model out of {len(self)} models ({n_runs} {'run' if n_runs == 1 else 'runs'})\n"]
+        out += [
+            f"Best model out of {len(self)} models ({n_runs} {'run' if n_runs == 1 else 'runs'})\n"
+        ]
 
         out += [f"{'Velocity model':<50}{'Model parameters'}"]
         out += [f"{40 * '-'}{'':10}{30 * '-'}"]
-        out += [f"{'d'.rjust(10)}{'vp'.rjust(10)}{'vs'.rjust(10)}{'rho'.rjust(10)}{'':10}{'d'.rjust(10)}{'vs'.rjust(10)}{'nu'.rjust(10)}"]
-        out += [f"{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[km/s]'.rjust(10)}{'[g/cm3]'.rjust(10)}{'':10}{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[-]'.rjust(10)}"]
+        out += [
+            f"{'d'.rjust(10)}{'vp'.rjust(10)}{'vs'.rjust(10)}{'rho'.rjust(10)}{'':10}{'d'.rjust(10)}{'vs'.rjust(10)}{'nu'.rjust(10)}"
+        ]
+        out += [
+            f"{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[km/s]'.rjust(10)}{'[g/cm3]'.rjust(10)}{'':10}{'[km]'.rjust(10)}{'[km/s]'.rjust(10)}{'[-]'.rjust(10)}"
+        ]
 
         # Tables
         out += [f"{40 * '-'}{'':10}{30 * '-'}"]
@@ -63,7 +69,7 @@ class InversionResult(dict):
         out += [f"Number of layers: {n_layers}"]
         out += [f"Number of parameters: {n_layers * 3 - 1}"]
         out += [f"Best model misfit: {self.misfit:>.4f}"]
-        
+
         out += [f"{80 * '-'}"]
 
         return "\n".join(out)
