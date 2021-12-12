@@ -20,17 +20,17 @@ class EarthModel:
     def __repr__(self):
         """Pretty model."""
         if not self.n_layers:
-            return self.__class__.__name__ + "()"
-
-        out = []
+            return f"{self.__class__.__name__}()"
 
         # Useful variables
         n_layers = self.n_layers
 
-        # Table header
+        # Output header
+        out = []
         out += [f"{80 * '-'}"]
         out += ["Earth model parameters\n"]
 
+        # Table header
         out += [f"{60 * '-'}"]
         out += [f"{'d [km]'.rjust(20)}{'vs [km/s]'.rjust(20)}{'nu [-]'.rjust(20)}"]
         out += [3 * f"{'min'.rjust(10)}{'max'.rjust(10)}"]

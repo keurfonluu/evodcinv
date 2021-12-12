@@ -23,21 +23,21 @@ class InversionResult(dict):
     def __repr__(self):
         """Pretty result."""
         if not self.keys():
-            return self.__class__.__name__ + "()"
-
-        out = []
+            return f"{self.__class__.__name__}()"
 
         # Useful variables
         n_layers = len(self.model)
         n_runs = self.n_runs
         x = np.insert(self.x, n_layers - 1, 0.0).reshape((n_layers, 3), order="F")
 
-        # Table headers
+        # Output header
+        out = []
         out += [f"{80 * '-'}"]
         out += [
             f"Best model out of {len(self)} models ({n_runs} {'run' if n_runs == 1 else 'runs'})\n"
         ]
 
+        # Table headers
         out += [f"{'Velocity model':<50}{'Model parameters'}"]
         out += [f"{40 * '-'}{'':10}{30 * '-'}"]
         out += [
