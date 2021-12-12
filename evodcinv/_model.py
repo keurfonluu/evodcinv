@@ -283,7 +283,7 @@ class EarthModel:
             velocity_models = np.empty((maxiter, popsize, self.n_layers, 4))
             for i in range(x.nit):
                 for j in range(popsize):
-                    velocity_models[i, j] = np.transpose(self.transform(x.xall[i, j]))
+                    velocity_models[i, j] = self.transform(x.xall[i, j])
 
             result = InversionResult(
                 xs=np.concatenate(x.xall),
@@ -317,13 +317,7 @@ class EarthModel:
         Returns
         -------
         array_like
-            Layer thickness.
-        array_like
-            Layer P-wave velocity.
-        array_like
-            Layer S-wave velocity.
-        array_like
-            Layer density.
+            Velocity model with shape (n_layers, 4).
 
         """
         thickness = x[: self.n_layers - 1]
@@ -332,11 +326,11 @@ class EarthModel:
         velocity_p = self._get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
 
-        return np.append(thickness, 1.0), velocity_p, velocity_s, density
+        return np.column_stack((np.append(thickness, 1.0), velocity_p, velocity_s, density))
 
     def _misfit_function(self, x, curves):
         """Misfit function to minimize."""
-        thickness, velocity_p, velocity_s, density = self.transform(x)
+        thickness, velocity_p, velocity_s, density = self.transform(x).T
         misfit = self._configuration["misfit"]
         normalize_weights = self._configuration["normalize_weights"]
         extra_terms = self._configuration["extra_terms"]
