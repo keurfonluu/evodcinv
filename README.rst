@@ -1,121 +1,153 @@
-********
-EvoDCinv
-********
+evodcinv
+========
 
-**WARNING**: forward modeling code has been moved to a seperate package (see `disba <https://github.com/keurfonluu/disba>`__). The API is being reworked and is going to change in the next version. This branch is currently unstable, please install ``evodcinv`` from PyPI.
+|License| |Stars| |Pyversions| |Version| |Downloads| |Code style: black| |Codacy Badge| |Codecov| |Build| |Travis| |DOI|
 
-.. figure:: examples/evodcinv.png
+**evodcinv** is a Python library to invert surface wave dispersion data (e.g., phase velocity dispersion curves) for an isotropic layered velocity model using Evolutionary Algorithms. It relies on `stochopy <https://github.com/keurfonluu/stochopy>`__ for the evolutionary optimizers while forward modeling is heavy-lifted by `disba <https://github.com/keurfonluu/disba>`__.
 
-EvoDCinv is a Python package that provides functions to calculate and invert
-dispersion curves using different evolutionary algorithms.
+.. figure:: https://raw.githubusercontent.com/keurfonluu/evodcinv/master/.github/sample.png
+   :alt: sample
+   :width: 100%
+   :align: center
 
-:Version: 1.0.0
-:Author: Keurfon Luu
-:Web site: https://github.com/keurfonluu/evodcinv
-:Copyright: This document has been placed in the public domain.
-:License: EvoDCinv is released under the MIT License.
+   Inversion of phase velocity dispersion curve (fundamental mode).
 
-**NOTE**: EvoDCinv has been implemented in the frame of my Ph. D. thesis. If you find any error or bug, or if you have any suggestion, please don't hesitate to contact me.
+Features
+--------
 
+Invertible data curves:
+
+-  Love-wave phase and/or group velocity dispersion curves,
+-  Rayleigh-wave phase and/or group velocity dispersion curves,
+-  Rayleigh-wave ellipticity (experimental).
 
 Installation
-============
+------------
 
-The recommended way to install EvoDCinv is through pip (internet required):
+The recommended way to install **evodcinv** and all its dependencies is through the Python Package Index:
 
-.. code-block:: bash
+.. code:: bash
 
-    pip install evodcinv
+   pip install evodcinv --user
 
-Otherwise, download and extract the package, then run:
+Otherwise, clone and extract the package, then run from the package location:
 
-.. code-block:: bash
+.. code:: bash
 
-    python setup.py install
+   pip install . --user
 
+To test the integrity of the installed package, check out this repository and run:
 
-Troubleshooting on Windows
-==========================
+.. code:: bash
 
-A Fortran compiler is required to install this package. While it is
-straightforward on Unix systems, it can be quite a pain on Windows. We recommend
-installing `Anaconda <https://www.continuum.io/downloads>`__ that contains all
-the required packages to install FTeikPy on Windows systems.
+   pytest
 
-1. Download `MinGW 64 bits <https://sourceforge.net/projects/mingw-w64/files/>`__
-   (choose *x86_64-posix-sjlj*) and extract the archive in your drive root.
+Documentation
+-------------
 
-2. Add MinGW to your system path:
+Refer to the online `documentation <https://keurfonluu.github.io/evodcinv/>`__ for detailed description of the API and examples.
 
-    C:\\<Your MinGW directory>\\bin
+Alternatively, the documentation can be built using `Sphinx <https://www.sphinx-doc.org/en/master/>`__:
 
-3. Create the file *distutils.cfg* in *<Your Python directory path>\\Lib\\distutils*
-   with the following content to use MinGW compiler:
+.. code:: bash
 
-.. code-block::
+   pip install -r doc/requirements.txt
+   sphinx-build -b html doc/source doc/build
 
-    [build]
-    compiler=mingw32
+Usage
+-----
 
-4. Open a terminal and install *libpython*:
+The following example inverts a Rayleigh-wave phase velocity dispersion curve (fundamental mode).
 
-.. code-block:: batch
+.. code:: python
 
-    conda install libpython
+    from evodcinv import EarthModel, Layer, Curve
 
+    # Initialize model
+    model = EarthModel()
 
-If you got the error:
+    # Build model search boundaries from top to bottom
+    # First argument is the bounds of layer's thickness [km]
+    # Second argument is the bounds of layer's S-wave velocity [km/s]
+    model.add(Layer([0.001, 0.1], [0.1, 3.0]))
+    model.add(Layer([0.001, 0.1], [0.1, 3.0]))
 
-    Error: ValueError: Unknown MS Compiler version 1900
+    # Configure model
+    model.configure(
+        optimizer="cpso",  # Evolutionary algorithm
+        misfit="rmse",  # Misfit function type
+        optimizer_args={
+            "popsize": 10,  # Population size
+            "maxiter": 100,  # Number of iterations
+            "workers": -1,  # Number of cores
+            "seed": 0,
+        },
+    )
 
-You may need to manually patch the file *cygwinccompiler.py* located in:
+    # Define the dispersion curves to invert
+    # period and velocity are assumed to be data arrays
+    curves = [Curve(period, velocity, 0, "rayleigh", "phase")]
 
-    <Your Python directory path>\\Lib\\distutils
+    # Run inversion
+    res = model.invert(curves)
+    print(res)
 
-by replacing:
-
-.. code-block:: python
-
-    self.dll_libraries = get_msvcr()
-
-in lines 157 and 318 by (be careful with indentation):
-
-.. code-block:: python
-
-    pass
-
-You should also patch the file *mingw32ccompiler.py* located in:
-
-    <Your Python directory path>\\Lib\\site-packages\\numpy\\distutils
-
-by commenting out from lines 96 to 104:
-
-.. code-block:: python
-
-    #        msvcr_success = build_msvcr_library()
-    #        msvcr_dbg_success = build_msvcr_library(debug=True)
-    #        if msvcr_success or msvcr_dbg_success:
-    #            # add preprocessor statement for using customized msvcr lib
-    #            self.define_macro('NPY_MINGW_USE_CUSTOM_MSVCR')
-    #
-    #        # Define the MSVC version as hint for MinGW
-    #        msvcr_version = '0x%03i0' % int(msvc_runtime_library().lstrip('msvcr'))
-    #        self.define_macro('__MSVCRT_VERSION__', msvcr_version)
-
-If you got the error:
+Expected output:
 
 .. code-block::
 
-    error: f90 not supported by GnuFCompiler needed for evodcinv/f90/dispcurve.f90
+    --------------------------------------------------------------------------------
+    Best model out of 1000 models (1 run)
 
-You may download the package and run the following command in the root directory:
+    Velocity model                                    Model parameters
+    ----------------------------------------          ------------------------------
+             d        vp        vs       rho                   d        vs        nu
+          [km]    [km/s]    [km/s]   [g/cm3]                [km]    [km/s]       [-]
+    ----------------------------------------          ------------------------------
+        0.0296    0.5033    0.2055    2.0000              0.0296    0.2055    0.4000
+        1.0000    1.8191    1.0080    2.0000                   -    1.0080    0.2785
+    ----------------------------------------          ------------------------------
 
-.. code-block::
+    Number of layers: 2
+    Number of parameters: 5
+    Best model misfit: 0.0153
+    --------------------------------------------------------------------------------
 
-    python setup.py config_fc --fcompiler=gnu95 install
-    
-    
-Related works
-=============
+Contributing
+------------
 
-* `StochOPy <https://github.com/keurfonluu/stochopy>`__: StochOPy (STOCHastic OPtimization for PYthon) provides user-friendly routines to sample or optimize objective functions with the most popular algorithms.
+Please refer to the `Contributing
+Guidelines <https://github.com/keurfonluu/evodcinv/blob/master/CONTRIBUTING.rst>`__ to see how you can help. This project is released with a `Code of Conduct <https://github.com/keurfonluu/evodcinv/blob/master/CODE_OF_CONDUCT.rst>`__ which you agree to abide by when contributing.
+
+.. |License| image:: https://img.shields.io/github/license/keurfonluu/evodcinv
+   :target: https://github.com/keurfonluu/evodcinv/blob/master/LICENSE
+
+.. |Stars| image:: https://img.shields.io/github/stars/keurfonluu/evodcinv?logo=github
+   :target: https://github.com/keurfonluu/evodcinv
+
+.. |Pyversions| image:: https://img.shields.io/pypi/pyversions/evodcinv.svg?style=flat
+   :target: https://pypi.org/pypi/evodcinv/
+
+.. |Version| image:: https://img.shields.io/pypi/v/evodcinv.svg?style=flat
+   :target: https://pypi.org/project/evodcinv
+
+.. |Downloads| image:: https://pepy.tech/badge/evodcinv
+   :target: https://pepy.tech/project/evodcinv
+
+.. |Code style: black| image:: https://img.shields.io/badge/code%20style-black-000000.svg?style=flat
+   :target: https://github.com/psf/black
+
+.. |Codacy Badge| image:: https://img.shields.io/codacy/grade/bd53f27ac85d419d996c434353f08760.svg?style=flat
+   :target: https://www.codacy.com/gh/keurfonluu/evodcinv/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=keurfonluu/evodcinv&amp;utm_campaign=Badge_Grade
+
+.. |Codecov| image:: https://img.shields.io/codecov/c/github/keurfonluu/evodcinv.svg?style=flat
+   :target: https://codecov.io/gh/keurfonluu/evodcinv
+
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.5775193.svg?style=flat
+   :target: https://doi.org/10.5281/zenodo.5775193
+
+.. |Build| image:: https://img.shields.io/github/workflow/status/keurfonluu/evodcinv/Python%20package
+   :target: https://github.com/keurfonluu/evodcinv
+
+.. |Travis| image:: https://img.shields.io/travis/com/keurfonluu/evodcinv/master?label=docs
+   :target: https://keurfonluu.github.io/evodcinv/

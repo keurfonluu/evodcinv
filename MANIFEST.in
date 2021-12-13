@@ -1,4 +1,0 @@
-include LICENSE
-include *.rst
-recursive-include evodcinv *
-recursive-include examples *

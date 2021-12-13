@@ -1,0 +1,34 @@
+name: Python package
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pip install coverage
+        NUMBA_DISABLE_JIT=1 coverage run -m pytest
+    - name: Submit coverage
+      if: ${{ matrix.python-version == '3.8' }}
+      run: |
+        pip install codecov
+        codecov --token=${{ secrets.CODECOV_TOKEN }}

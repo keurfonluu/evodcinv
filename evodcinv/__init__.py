@@ -1,21 +1,15 @@
-# -*- coding: utf-8 -*-
+from .__about__ import __version__
+from ._curve import Curve
+from ._io import read
+from ._layer import Layer
+from ._model import EarthModel
+from ._result import InversionResult
 
-"""
-Author: Keurfon Luu <keurfon.luu@mines-paristech.fr>
-License: MIT
-"""
-
-from .dispersion_curve import DispersionCurve
-from .layered_model import LayeredModel, params2lay, params2vel
-from .progression import progress_bar, progress_perc, progress
-
-__version__ = "1.0.0"
 __all__ = [
-    "DispersionCurve",
-    "LayeredModel",
-    "params2lay",
-    "params2vel",
-    "progress_bar",
-    "progress_perc",
-    "progress",
-    ]
+    "Curve",
+    "EarthModel",
+    "Layer",
+    "InversionResult",
+    "read",
+    "__version__",
+]
