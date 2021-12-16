@@ -42,7 +42,7 @@ def write(filename, result, compression_opts=4):
     with h5py.File(filename, "w") as f:
         for k, v in result.items():
             if np.ndim(v) == 0:
-                f.create_dataset(k, data=(v,), compression_opts=compression_opts)
+                f.create_dataset(k, data=(v,), compression="gzip", compression_opts=compression_opts)
 
             else:
-                f.create_dataset(k, data=v, compression_opts=compression_opts)
+                f.create_dataset(k, data=v, compression="gzip", compression_opts=compression_opts)
