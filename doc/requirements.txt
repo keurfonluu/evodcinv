@@ -4,4 +4,4 @@ sphinx-argparse
 sphinx-gallery
 pydata-sphinx-theme
 sphinxcontrib-bibtex
--e git://github.com/Naeka/pybtex-apa-style.git#egg=pybtex-apa-style
+pybtex-apa-style

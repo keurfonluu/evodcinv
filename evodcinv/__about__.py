@@ -1,9 +1,9 @@
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
+import pathlib
 
-try:
-    __version__ = metadata.version("evodcinv")
-except Exception:
-    __version__ = "unknown"
+__all__ = [
+    "__version__",
+]
+
+
+with open(f"{pathlib.Path(__file__).parent}/VERSION") as f:
+    __version__ = f.readline().strip()

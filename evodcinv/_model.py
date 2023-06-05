@@ -369,7 +369,11 @@ class EarthModel:
 
                 else:
                     ell = Ellipticity(
-                        thickness, velocity_p, velocity_s, density, dc=dc,
+                        thickness,
+                        velocity_p,
+                        velocity_s,
+                        density,
+                        dc=dc,
                     )
                     rel = ell(curve.period, mode=curve.mode)
                     dcalc = np.abs(rel.ellipticity)

@@ -14,6 +14,11 @@ def build(c):
 
 
 @task
+def html(c):
+    c.run("sphinx-build -b html doc/source doc/build")
+
+
+@task
 def tag(c):
     c.run("git tag v{}".format(evodcinv.__version__))
     c.run("git push --tags")
@@ -30,6 +35,8 @@ def clean(c, bytecode=False):
         "build",
         "dist",
         "evodcinv.egg-info",
+        "doc/build",
+        "doc/source/examples",
     ]
 
     if bytecode:
@@ -45,8 +52,8 @@ def clean(c, bytecode=False):
 
 @task
 def black(c):
-    c.run("black -t py36 evodcinv")
-    c.run("black -t py36 test")
+    c.run("black -t py38 evodcinv")
+    c.run("black -t py38 tests")
 
 
 @task
@@ -57,7 +64,7 @@ def docstring(c):
 @task
 def isort(c):
     c.run("isort evodcinv")
-    c.run("isort test")
+    c.run("isort tests")
 
 
 @task

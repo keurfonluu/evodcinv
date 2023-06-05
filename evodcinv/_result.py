@@ -230,7 +230,12 @@ class InversionResult(dict):
 
             def get_y(thickness, velocity_p, velocity_s, density):
                 ell = Ellipticity(
-                    thickness, velocity_p, velocity_s, density, "dunkin", dc,
+                    thickness,
+                    velocity_p,
+                    velocity_s,
+                    density,
+                    "dunkin",
+                    dc,
                 )
                 rel = ell(period, mode)
 
