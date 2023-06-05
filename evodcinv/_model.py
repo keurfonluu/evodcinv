@@ -232,7 +232,6 @@ class EarthModel:
         _optimizer_args.update(optimizer_args)
 
         maxiter = _optimizer_args["maxiter"]
-        popsize = _optimizer_args["popsize"]
 
         # Overwrite options
         constraints = {
@@ -280,6 +279,7 @@ class EarthModel:
                 )
 
             # Parse output
+            popsize = x.xall.shape[1]
             velocity_models = np.empty((maxiter, popsize, self.n_layers, 4))
             for i in range(x.nit):
                 for j in range(popsize):
