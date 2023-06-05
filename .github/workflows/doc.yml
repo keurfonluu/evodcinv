@@ -1,0 +1,35 @@
+name: Build documentation
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  docs:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: nschloe/action-cached-lfs-checkout@v1
+      - uses: actions/setup-python@v4
+        with:
+            python-version: '3.9'
+      - name: Install toughio
+        run: |
+          git lfs pull
+          pip install -e .[full]
+      - name: Install dependencies
+        run: |
+          pip install -r doc/requirements.txt
+      - name: Sphinx build
+        run: |
+          sphinx-build -b html doc/source doc/build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: doc/build/
+          force_orphan: true

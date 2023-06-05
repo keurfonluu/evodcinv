@@ -35,5 +35,9 @@ model.configure(
     optimizer="cpso",
     misfit="rmse",
     density="nafe-drake",
-    optimizer_args={"popsize": 5, "maxiter": 5, "seed": 0,},
+    optimizer_args={
+        "popsize": 5,
+        "maxiter": 5,
+        "seed": 0,
+    },
 )
