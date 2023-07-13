@@ -31,13 +31,3 @@ curves = [Curve(period, data, 0, "rayleigh", "phase", weight=1.0, uncertainties=
 model = EarthModel()
 model.add(Layer([0.001, 0.1], [0.1, 3.0]))
 model.add(Layer([0.001, 0.1], [0.1, 3.0]))
-model.configure(
-    optimizer="cpso",
-    misfit="rmse",
-    density="nafe-drake",
-    optimizer_args={
-        "popsize": 5,
-        "maxiter": 5,
-        "seed": 0,
-    },
-)
