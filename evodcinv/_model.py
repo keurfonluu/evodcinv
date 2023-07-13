@@ -134,13 +134,13 @@ class EarthModel:
             If `True`, weights associated to individual misfit terms are normalized.
         increasing_velocity : bool, optional, default True
             If `True`, optimize for increasing velocity models. Note that a penalty term is added to `extra_terms`.
-        extra_terms : sequence of callable, optional, default True
+        extra_terms : sequence of callable or None, optional, default None
             Additional misfit terms. Must be a sequence of callables.
         dc : scalar, optional, default 0.001
             Phase velocity increment for root finding.
         dt : scalar, optional, default 0.01
             Frequency increment (%) for calculating group velocity.
-        optimizer_args : dict, optional, default None
+        optimizer_args : dict or None, optional, default None
             A dictionary of solver options. All methods accept the following generic options:
 
              - maxiter (int): maximum number of iterations to perform
@@ -299,11 +299,7 @@ class EarthModel:
 
                 return 0.0 if (vs[1:] >= vs[:-1]).all() else np.Inf
 
-            if self._configuration["extra_terms"] is not None:
-                self._configuration["extra_terms"] = list(
-                    self._configuration["extra_terms"]
-                )
-                self._configuration["extra_terms"].append(constraint)
+            self._configuration["extra_terms"].append(constraint)
 
         else:
             x0 = None
