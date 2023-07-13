@@ -493,7 +493,7 @@ class InversionResult(dict):
         idx = ~np.isinf(self.misfits) if value is None else self.misfits <= value
 
         return InversionResult(
-            xs=self.xs,
+            xs=self.xs[idx],
             models=self.models[idx],
             misfits=self.misfits[idx],
             global_misfits=self.global_misfits,

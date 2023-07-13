@@ -2,6 +2,7 @@ import numpy as np
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
+from stochopy.optimize._common import lhs
 
 from ._common import itype
 from ._curve import Curve
@@ -96,6 +97,7 @@ class EarthModel:
         misfit="rmse",
         density="nafe-drake",
         normalize_weights=True,
+        increasing_velocity=False,
         extra_terms=None,
         dc=0.001,
         dt=0.01,
@@ -130,13 +132,15 @@ class EarthModel:
 
         normalize_weights : bool, optional, default True
             If `True`, weights associated to individual misfit terms are normalized.
-        extra_terms : sequence of callable, optional, default True
+        increasing_velocity : bool, optional, default True
+            If `True`, optimize for increasing velocity models. Note that a penalty term is added to `extra_terms`.
+        extra_terms : sequence of callable or None, optional, default None
             Additional misfit terms. Must be a sequence of callables.
         dc : scalar, optional, default 0.001
             Phase velocity increment for root finding.
         dt : scalar, optional, default 0.01
             Frequency increment (%) for calculating group velocity.
-        optimizer_args : dict, optional, default None
+        optimizer_args : dict or None, optional, default None
             A dictionary of solver options. All methods accept the following generic options:
 
              - maxiter (int): maximum number of iterations to perform
@@ -189,6 +193,7 @@ class EarthModel:
             "dc": dc,
             "dt": dt,
             "normalize_weights": normalize_weights,
+            "increasing_velocity": increasing_velocity,
             "extra_terms": extra_terms,
             "optimizer_args": optimizer_args,
         }
@@ -232,6 +237,7 @@ class EarthModel:
         _optimizer_args.update(optimizer_args)
 
         maxiter = _optimizer_args["maxiter"]
+        popsize = _optimizer_args["popsize"]
 
         # Overwrite options
         constraints = {
@@ -261,6 +267,43 @@ class EarthModel:
             ]
         )
 
+        # Increasing velocity models
+        if self._configuration["increasing_velocity"]:
+            # Sample thickness and Poisson's ratio
+            idx = np.concatenate(
+                (
+                    np.arange(self.n_layers - 1),
+                    np.arange(2 * self.n_layers, 3 * self.n_layers) - 1,
+                )
+            )
+            dnu0 = lhs(popsize, idx.size, bounds[idx])
+
+            # Sample S-wave velocity
+            v0 = [np.random.uniform(*self._layers[0].velocity_s, size=popsize).tolist()]
+
+            for layer in self._layers[1:]:
+                vmin, vmax = layer.velocity_s
+                tmp = [np.random.uniform(max(v, vmin), vmax) for v in v0[-1]]
+                v0.append(tmp)
+
+            v0 = np.transpose(v0)
+
+            # Initial population
+            x0 = np.column_stack(
+                (dnu0[:, : self.n_layers - 1], v0, dnu0[:, self.n_layers - 1 :])
+            )
+
+            # Penalty term
+            def constraint(x):
+                vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
+
+                return 0.0 if (vs[1:] >= vs[:-1]).all() else np.Inf
+
+            self._configuration["extra_terms"].append(constraint)
+
+        else:
+            x0 = None
+
         results = []
         for i in range(maxrun):
             prefix = f"Run {i + 1:<{len(str(maxiter)) - 1}d}"
@@ -273,6 +316,7 @@ class EarthModel:
                 x = minimize(
                     func,
                     bounds,
+                    x0=x0,
                     method=method,
                     options=_optimizer_args,
                     callback=callback,
