@@ -270,7 +270,12 @@ class EarthModel:
         # Increasing velocity models
         if self._configuration["increasing_velocity"]:
             # Sample thickness and Poisson's ratio
-            idx = np.concatenate((np.arange(self.n_layers - 1), np.arange(2 * self.n_layers, 3 * self.n_layers) - 1))
+            idx = np.concatenate(
+                (
+                    np.arange(self.n_layers - 1),
+                    np.arange(2 * self.n_layers, 3 * self.n_layers) - 1,
+                )
+            )
             dnu0 = lhs(popsize, idx.size, bounds[idx])
 
             # Sample S-wave velocity
@@ -282,18 +287,22 @@ class EarthModel:
                 v0.append(tmp)
 
             v0 = np.transpose(v0)
-            
+
             # Initial population
-            x0 = np.column_stack((dnu0[:, :self.n_layers - 1], v0, dnu0[:, self.n_layers - 1:]))
+            x0 = np.column_stack(
+                (dnu0[:, : self.n_layers - 1], v0, dnu0[:, self.n_layers - 1 :])
+            )
 
             # Penalty term
             def constraint(x):
                 vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
 
                 return 0.0 if (vs[1:] >= vs[:-1]).all() else np.Inf
-                
+
             if self._configuration["extra_terms"] is not None:
-                self._configuration["extra_terms"] = list(self._configuration["extra_terms"])
+                self._configuration["extra_terms"] = list(
+                    self._configuration["extra_terms"]
+                )
                 self._configuration["extra_terms"].append(constraint)
 
         else:

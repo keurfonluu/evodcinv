@@ -1,11 +1,13 @@
 import copy
+
+import helpers
 import numpy as np
 import pytest
 
-import helpers
 
-
-@pytest.mark.parametrize("xref, increasing_velocity", [(8.90561595, False), (12.76397397, True)])
+@pytest.mark.parametrize(
+    "xref, increasing_velocity", [(8.90561595, False), (12.76397397, True)]
+)
 def test_invert(xref, increasing_velocity):
     model = copy.deepcopy(helpers.model)
     model.configure(
