@@ -38,6 +38,7 @@ class EarthModel:
 
         # Table
         out += [f"{60 * '-'}"]
+        n_params = 0
 
         for layer in self.layers:
             d_min, d_max = layer.thickness
@@ -47,11 +48,15 @@ class EarthModel:
                 f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"
             ]
 
+            n_params += int(d_min != d_max)
+            n_params += int(vs_min != vs_max)
+            n_params += int(nu_min != nu_max)
+
         out += [f"{60 * '-'}\n"]
 
         # Misc
         out += [f"Number of layers: {n_layers}"]
-        out += [f"Number of parameters: {n_layers * 3 - 1}"]
+        out += [f"Number of parameters: {n_params}"]
 
         out += [f"{80 * '-'}"]
 
