@@ -2,7 +2,6 @@ import numpy as np
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
-from stochopy.optimize._common import lhs
 
 from ._common import itype
 from ._curve import Curve
@@ -38,6 +37,7 @@ class EarthModel:
 
         # Table
         out += [f"{60 * '-'}"]
+        n_params = 0
 
         for layer in self.layers:
             d_min, d_max = layer.thickness
@@ -47,11 +47,15 @@ class EarthModel:
                 f"{d_min:>10.4f}{d_max:>10.4f}{vs_min:>10.4f}{vs_max:>10.4f}{nu_min:>10.4f}{nu_max:>10.4f}"
             ]
 
+            n_params += int(d_min != d_max)
+            n_params += int(vs_min != vs_max)
+            n_params += int(nu_min != nu_max)
+
         out += [f"{60 * '-'}\n"]
 
         # Misc
         out += [f"Number of layers: {n_layers}"]
-        out += [f"Number of parameters: {n_layers * 3 - 1}"]
+        out += [f"Number of parameters: {n_params}"]
 
         out += [f"{80 * '-'}"]
 
@@ -239,6 +243,13 @@ class EarthModel:
         maxiter = _optimizer_args["maxiter"]
         popsize = _optimizer_args["popsize"]
 
+        # Initial population
+        if "x0" in _optimizer_args:
+            x0 = _optimizer_args.pop("x0")
+
+        else:
+            x0 = None
+
         # Overwrite options
         constraints = {
             "cmaes": "Penalize",
@@ -259,41 +270,20 @@ class EarthModel:
 
         # Minimize misfit function
         func = lambda x: self._misfit_function(x, curves)
-        bounds = np.vstack(
-            [
-                [layer.thickness for layer in self._layers[:-1]],
-                [layer.velocity_s for layer in self._layers],
-                [layer.poisson for layer in self._layers],
-            ]
-        )
 
-        # Increasing velocity models
+        # Search boundaries
+        thickness_bounds = np.array([layer.thickness for layer in self._layers[:-1]])
+        velocity_bounds = np.array([layer.velocity_s for layer in self._layers])
+        poisson_bounds = np.array([layer.poisson for layer in self._layers])
+        bounds = np.vstack([thickness_bounds, velocity_bounds, poisson_bounds])
+
+        # Increasing velocity models: penalty term
         if self._configuration["increasing_velocity"]:
-            # Sample thickness and Poisson's ratio
-            idx = np.concatenate(
-                (
-                    np.arange(self.n_layers - 1),
-                    np.arange(2 * self.n_layers, 3 * self.n_layers) - 1,
+            if method in {"cmaes", "vdcma"}:
+                raise NotImplementedError(
+                    f"Option `increasing_velocity` is not compatible yet with optimizer `{method}`."
                 )
-            )
-            dnu0 = lhs(popsize, idx.size, bounds[idx])
 
-            # Sample S-wave velocity
-            v0 = [np.random.uniform(*self._layers[0].velocity_s, size=popsize).tolist()]
-
-            for layer in self._layers[1:]:
-                vmin, vmax = layer.velocity_s
-                tmp = [np.random.uniform(max(v, vmin), vmax) for v in v0[-1]]
-                v0.append(tmp)
-
-            v0 = np.transpose(v0)
-
-            # Initial population
-            x0 = np.column_stack(
-                (dnu0[:, : self.n_layers - 1], v0, dnu0[:, self.n_layers - 1 :])
-            )
-
-            # Penalty term
             def constraint(x):
                 vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
 
@@ -301,12 +291,49 @@ class EarthModel:
 
             self._configuration["extra_terms"].append(constraint)
 
-        else:
-            x0 = None
-
+        # Run maxrun inversion
         results = []
+
         for i in range(maxrun):
             prefix = f"Run {i + 1:<{len(str(maxiter)) - 1}d}"
+
+            # Increasing velocity models: initial population
+            if self._configuration["increasing_velocity"] and x0 is None:
+                n = 1 if method in {"cmaes", "vdcma"} else popsize
+
+                # Sample thickness
+                thicknesses = np.random.uniform(
+                    *thickness_bounds.T, size=(n, self.n_layers - 1)
+                )
+                depths = np.column_stack([np.zeros(n), thicknesses.cumsum(axis=1)])
+
+                # Sample S-wave velocity
+                vmin, vmax = velocity_bounds[-1]
+                top_velocities = np.random.uniform(*self._layers[0].velocity_s, size=n)
+                bottom_velocities = [
+                    np.random.uniform(max(vs, vmin), vmax) for vs in top_velocities
+                ]
+                velocities = np.array(
+                    [
+                        np.interp(z, [0.0, z[-1]], [vtop, vbot]).clip(
+                            *velocity_bounds.T
+                        )
+                        for z, vtop, vbot in zip(
+                            depths, top_velocities, bottom_velocities
+                        )
+                    ]
+                )
+
+                # Sample Poisson's ratio
+                poissons = np.random.uniform(*poisson_bounds.T, size=(n, self.n_layers))
+
+                # Concatenate samples
+                x0i = np.column_stack((thicknesses, velocities, poissons))
+                x0i = x0i.ravel() if method in {"cmaes", "vdcma"} else x0i
+
+            else:
+                x0i = x0
+
             with ProgressBar(prefix, max=maxiter) as bar:
 
                 def callback(X, res):
@@ -316,7 +343,7 @@ class EarthModel:
                 x = minimize(
                     func,
                     bounds,
-                    x0=x0,
+                    x0=x0i,
                     method=method,
                     options=_optimizer_args,
                     callback=callback,
