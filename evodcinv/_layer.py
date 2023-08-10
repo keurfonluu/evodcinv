@@ -29,16 +29,16 @@ class Layer:
             if ndim == 0:
                 if not isinstance(v, (int, float)):
                     raise ValueError()
-                
+
                 v = (v, v)
-                
+
             elif ndim == 1:
                 if len(v) != 2:
                     raise ValueError()
-                
+
                 if v[0] > v[1]:
                     raise ValueError()
-            
+
             setattr(self, f"_{k}", tuple(v))
 
     def __repr__(self):
