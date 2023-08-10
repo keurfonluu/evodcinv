@@ -2,7 +2,6 @@ import numpy as np
 from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
-from stochopy.optimize._common import lhs
 
 from ._common import itype
 from ._curve import Curve
@@ -280,6 +279,8 @@ class EarthModel:
 
         # Increasing velocity models: penalty term
         if self._configuration["increasing_velocity"]:
+            if method in {"cmaes", "vdcma"}:
+                raise NotImplementedError(f"Option `increasing_velocity` is not compatible yet with optimizer `{method}`.")
 
             def constraint(x):
                 vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
@@ -296,13 +297,15 @@ class EarthModel:
 
             # Increasing velocity models: initial population
             if self._configuration["increasing_velocity"] and x0 is None:
+                n = 1 if method in {"cmaes", "vdcma"} else popsize
+
                 # Sample thickness
-                thicknesses = np.random.uniform(*thickness_bounds.T, size=(popsize, self.n_layers - 1))
-                depths = np.column_stack([np.zeros(popsize), thicknesses.cumsum(axis=1)])
+                thicknesses = np.random.uniform(*thickness_bounds.T, size=(n, self.n_layers - 1))
+                depths = np.column_stack([np.zeros(n), thicknesses.cumsum(axis=1)])
 
                 # Sample S-wave velocity
                 vmin, vmax = velocity_bounds[-1]
-                top_velocities = np.random.uniform(*self._layers[0].velocity_s, size=popsize)
+                top_velocities = np.random.uniform(*self._layers[0].velocity_s, size=n)
                 bottom_velocities = [np.random.uniform(max(vs, vmin), vmax) for vs in top_velocities]
                 velocities = np.array([
                     np.interp(z, [0.0, z[-1]], [vtop, vbot]).clip(*velocity_bounds.T)
@@ -310,10 +313,11 @@ class EarthModel:
                 ])
 
                 # Sample Poisson's ratio
-                poissons = np.random.uniform(*poisson_bounds.T, size=(popsize, self.n_layers))
+                poissons = np.random.uniform(*poisson_bounds.T, size=(n, self.n_layers))
 
                 # Concatenate samples
                 x0i = np.column_stack((thicknesses, velocities, poissons))
+                x0i = x0i.ravel() if method in {"cmaes", "vdcma"} else x0i
 
             else:
                 x0i = x0
