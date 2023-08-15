@@ -3,6 +3,7 @@ from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
 
+from . import factory
 from ._common import itype
 from ._curve import Curve
 from ._helpers import nafe_drake
@@ -284,12 +285,7 @@ class EarthModel:
                     f"Option `increasing_velocity` is not compatible yet with optimizer `{method}`."
                 )
 
-            def constraint(x):
-                vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
-
-                return 0.0 if (vs[1:] >= vs[:-1]).all() else np.Inf
-
-            self._configuration["extra_terms"].append(constraint)
+            self._configuration["extra_terms"].append(factory.increasing_velocity)
 
         # Run maxrun inversion
         results = []
