@@ -451,11 +451,8 @@ class EarthModel:
 
                 n = len(dcalc)
                 if n > 0:
-                    sigma = (
-                        curve.data[:n]
-                        if curve.uncertainties is None
-                        else curve.uncertainties[:n]
-                    )
+                    sigma = curve.uncertainties
+                    sigma = sigma if np.ndim(sigma) == 0 else sigma[:n]
                     error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
                     weights_sum += curve.weight
 
