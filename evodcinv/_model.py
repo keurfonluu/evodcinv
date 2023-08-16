@@ -333,7 +333,9 @@ class EarthModel:
             with ProgressBar(prefix, max=maxiter) as bar:
 
                 def callback(X, res):
-                    bar.misfit = f"{res.fun:.4f}" if res.fun >= 1.0e-4 else f"{res.fun:.4e}"
+                    bar.misfit = (
+                        f"{res.fun:.4f}" if res.fun >= 1.0e-4 else f"{res.fun:.4e}"
+                    )
                     bar.next()
 
                 x = minimize(
@@ -447,7 +449,9 @@ class EarthModel:
 
                 n = len(dcalc)
                 if n > 0:
-                    sigma = curve.uncertainties if curve.uncertainties is not None else 1.0
+                    sigma = (
+                        curve.uncertainties if curve.uncertainties is not None else 1.0
+                    )
                     sigma = sigma[:n] if np.ndim(sigma) == 1 else sigma
                     error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
                     weights_sum += curve.weight

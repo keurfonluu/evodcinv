@@ -44,7 +44,11 @@ class Curve:
             raise ValueError()
         if not is_sorted(period):
             raise ValueError()
-        if uncertainties is not None and np.ndim(uncertainties) == 1 and len(uncertainties) != len(data):
+        if (
+            uncertainties is not None
+            and np.ndim(uncertainties) == 1
+            and len(uncertainties) != len(data)
+        ):
             raise ValueError()
 
         self._period = np.asarray(period)

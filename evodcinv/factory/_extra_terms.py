@@ -16,7 +16,7 @@ def increasing_velocity(x, penalty=np.inf):
     -------
     scalar
         Misfit value.
-    
+
     """
     n_layers = (len(x) + 1) // 3
     vs = x[n_layers - 1 : 2 * n_layers - 1]
@@ -45,7 +45,7 @@ def prior(x, depth, velocity_s, uncertainties=None, alpha=1.0e-3):
     -------
     scalar
         Misfit value.
-    
+
     """
     n_layers = (len(x) + 1) // 3
     d = x[: n_layers - 1]
@@ -74,7 +74,7 @@ def smooth(x, alpha=1.0e-3):
     -------
     scalar
         Misfit value.
-    
+
     """
     n_layers = (len(x) + 1) // 3
     vs = x[n_layers - 1 : 2 * n_layers - 1]
