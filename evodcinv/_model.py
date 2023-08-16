@@ -333,7 +333,7 @@ class EarthModel:
             with ProgressBar(prefix, max=maxiter) as bar:
 
                 def callback(X, res):
-                    bar.misfit = res.fun
+                    bar.misfit = f"{res.fun:.4f}" if res.fun >= 1.0e-4 else f"{res.fun:.4e}"
                     bar.next()
 
                 x = minimize(

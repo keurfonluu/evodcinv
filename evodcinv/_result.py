@@ -66,9 +66,10 @@ class InversionResult(dict):
         out += [f"{40 * '-'}{'':10}{30 * '-'}\n"]
 
         # Misc
+        misfit = f"{self.misfit:.4f}" if self.misfit >= 1.0e-4 else f"{self.misfit:.4e}"
         out += [f"Number of layers: {n_layers}"]
         out += [f"Number of parameters: {n_layers * 3 - 1}"]
-        out += [f"Best model misfit: {self.misfit:>.4f}"]
+        out += [f"Best model misfit: {misfit}"]
 
         out += [f"{80 * '-'}"]
 
