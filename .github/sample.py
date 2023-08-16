@@ -41,7 +41,7 @@ density = lambda vp: 2.0
 model.configure(
     optimizer="cpso",
     misfit="rmse",
-    density=lambda vp: 2.0,
+    density=density,
     optimizer_args={
         "popsize": 10,
         "maxiter": 100,
@@ -56,7 +56,7 @@ curves = [Curve(cp.period, cp.velocity, 0, "rayleigh", "phase")]
 # Run inversion
 # See stochopy's documentation for optimizer options <https://keurfonluu.github.io/stochopy/>
 res = model.invert(curves)
-res = res.threshold(0.1)
+res = res.threshold(0.02)
 
 # Plot results
 fig, ax = plt.subplots(1, 3, figsize=(15, 6))

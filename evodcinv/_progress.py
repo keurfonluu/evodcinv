@@ -9,7 +9,7 @@ class ProgressBar(IncrementalBar):
 
         self.width = 20
         self.suffix = (
-            "%(percent)3d%% [%(elapsed_td)s / %(eta_td)s] - Misfit: %(misfit).4f"
+            "%(percent)3d%% [%(elapsed_td)s / %(eta_td)s] - Misfit: %(misfit)s"
         )
         self.check_tty = False
         self.misfit = np.Inf

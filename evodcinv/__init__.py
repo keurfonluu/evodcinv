@@ -1,3 +1,4 @@
+from . import factory
 from .__about__ import __version__
 from ._curve import Curve
 from ._io import read
@@ -10,6 +11,7 @@ __all__ = [
     "EarthModel",
     "Layer",
     "InversionResult",
+    "factory",
     "read",
     "__version__",
 ]

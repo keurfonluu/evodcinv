@@ -3,6 +3,7 @@ from disba import DispersionError, Ellipticity, surf96
 from disba._common import ifunc
 from stochopy.optimize import minimize
 
+from . import factory
 from ._common import itype
 from ._curve import Curve
 from ._helpers import nafe_drake
@@ -284,12 +285,7 @@ class EarthModel:
                     f"Option `increasing_velocity` is not compatible yet with optimizer `{method}`."
                 )
 
-            def constraint(x):
-                vs = x[self.n_layers - 1 : 2 * self.n_layers - 1]
-
-                return 0.0 if (vs[1:] >= vs[:-1]).all() else np.Inf
-
-            self._configuration["extra_terms"].append(constraint)
+            self._configuration["extra_terms"].append(factory.increasing_velocity)
 
         # Run maxrun inversion
         results = []
@@ -337,7 +333,9 @@ class EarthModel:
             with ProgressBar(prefix, max=maxiter) as bar:
 
                 def callback(X, res):
-                    bar.misfit = res.fun
+                    bar.misfit = (
+                        f"{res.fun:.4f}" if res.fun >= 1.0e-4 else f"{res.fun:.4e}"
+                    )
                     bar.next()
 
                 x = minimize(
@@ -452,10 +450,9 @@ class EarthModel:
                 n = len(dcalc)
                 if n > 0:
                     sigma = (
-                        curve.data[:n]
-                        if curve.uncertainties is None
-                        else curve.uncertainties[:n]
+                        curve.uncertainties if curve.uncertainties is not None else 1.0
                     )
+                    sigma = sigma[:n] if np.ndim(sigma) == 1 else sigma
                     error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
                     weights_sum += curve.weight
 

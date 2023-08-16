@@ -31,7 +31,7 @@ class Curve:
         weight : scalar, optional, default 1.0
             Overall weight applied to the misfit error associated to this data set.
         uncertainties : scalar, array_like or None, optional, default None
-            Uncertainties associated to data points. If None, error will be normalized by `data`.
+            Uncertainties associated to data points.
 
         """
         if len(period) != len(data):
@@ -43,6 +43,12 @@ class Curve:
         if type not in {"phase", "group", "ellipticity"}:
             raise ValueError()
         if not is_sorted(period):
+            raise ValueError()
+        if (
+            uncertainties is not None
+            and np.ndim(uncertainties) == 1
+            and len(uncertainties) != len(data)
+        ):
             raise ValueError()
 
         self._period = np.asarray(period)
