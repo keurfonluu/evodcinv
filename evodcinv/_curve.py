@@ -11,7 +11,7 @@ class Curve:
         wave="rayleigh",
         type="phase",
         weight=1.0,
-        uncertainties=1.0,
+        uncertainties=None,
     ):
         """
         Curve data class.
@@ -30,7 +30,7 @@ class Curve:
             Data type.
         weight : scalar, optional, default 1.0
             Overall weight applied to the misfit error associated to this data set.
-        uncertainties : scalar or array_like, optional, default 1.0
+        uncertainties : scalar, array_like or None, optional, default None
             Uncertainties associated to data points.
 
         """
@@ -44,6 +44,8 @@ class Curve:
             raise ValueError()
         if not is_sorted(period):
             raise ValueError()
+        if uncertainties is not None and np.ndim(uncertainties) == 1 and len(uncertainties) != len(data):
+            raise ValueError()
 
         self._period = np.asarray(period)
         self._data = np.asarray(data)
@@ -51,7 +53,7 @@ class Curve:
         self._wave = wave
         self._type = type
         self._weight = weight
-        self._uncertainties = uncertainties if uncertainties is not None else 1.0
+        self._uncertainties = uncertainties
 
     def __repr__(self):
         """Pretty curve."""
