@@ -448,12 +448,12 @@ class EarthModel:
                     dcalc = np.abs(rel.ellipticity)
 
                 n = len(dcalc)
-                if n > 0:
+                if n == len(curve.data):
                     sigma = (
                         curve.uncertainties if curve.uncertainties is not None else 1.0
                     )
-                    sigma = sigma[:n] if np.ndim(sigma) == 1 else sigma
-                    error += curve.weight * misfit((dcalc - curve.data[:n]) / sigma)
+                    sigma = sigma if np.ndim(sigma) == 1 else sigma
+                    error += curve.weight * misfit((dcalc - curve.data) / sigma)
                     weights_sum += curve.weight
 
                 else:
