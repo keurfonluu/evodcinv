@@ -448,7 +448,7 @@ class EarthModel:
                     dcalc = np.abs(rel.ellipticity)
 
                 n = len(dcalc)
-                if n == curve.data:
+                if n == len(curve.data):
                     sigma = (
                         curve.uncertainties if curve.uncertainties is not None else 1.0
                     )
