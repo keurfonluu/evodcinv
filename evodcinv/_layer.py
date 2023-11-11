@@ -12,6 +12,11 @@ class Layer:
             Layer thickness search boundary (in km).
         velocity_s : scalar or array_like
             Layer S-wave velocity search boundary (in km/s).
+            For the first layer, it can be lower or equal to zero for a water layer which P-wave velocity is determined as follows:
+
+             - Vs = 0, Vp = 1.5 km/s
+             - Vs < 0, Vp = -Vs km/s
+
         poisson : scalar, array_like or None, optional, default None
             Layer Poisson's ratio search boundary.
 
