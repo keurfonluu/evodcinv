@@ -287,7 +287,7 @@ class EarthModel:
 
             self._configuration["extra_terms"].append(factory.increasing_velocity)
 
-        # Run maxrun inversion
+        # Run maxrun inversions
         results = []
 
         for i in range(maxrun):
@@ -389,11 +389,23 @@ class EarthModel:
             Velocity model with shape (n_layers, 4).
 
         """
-        thickness = x[: self.n_layers - 1]
-        velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1]
-        poisson = x[2 * self.n_layers - 1 :]
+        thickness = x[: self.n_layers - 1].copy()
+        velocity_s = x[self.n_layers - 1 : 2 * self.n_layers - 1].copy()
+        poisson = x[2 * self.n_layers - 1 :].copy()
         velocity_p = self._get_velocity_p(velocity_s, poisson)
         density = self._get_density(velocity_p)
+
+        # Handle water layer
+        cond = np.flatnonzero(velocity_s <= 0.0)
+
+        if cond.size:
+            if cond[0] != 0 or cond.size != 1:
+                raise ValueError("only the first layer can be a water layer.")
+
+            else:
+                velocity_p[0] = abs(velocity_s[0]) if velocity_s[0] < 0.0 else 1.5
+                velocity_s[0] = 0.0
+                density[0] = 1.0
 
         return np.column_stack(
             (np.append(thickness, 1.0), velocity_p, velocity_s, density)
