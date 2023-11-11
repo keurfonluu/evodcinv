@@ -1,0 +1,887 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>evodcinv._model &#8212; evodcinv 2.2.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+
+    <script src="../../_static/documentation_options.js?v=219dea72"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/evodcinv/_model';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">evodcinv 2.2.2 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../api/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">evodcinv._model</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for evodcinv._model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">disba</span> <span class="kn">import</span> <span class="n">DispersionError</span><span class="p">,</span> <span class="n">Ellipticity</span><span class="p">,</span> <span class="n">surf96</span>
+<span class="kn">from</span> <span class="nn">disba._common</span> <span class="kn">import</span> <span class="n">ifunc</span>
+<span class="kn">from</span> <span class="nn">stochopy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">factory</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">itype</span>
+<span class="kn">from</span> <span class="nn">._curve</span> <span class="kn">import</span> <span class="n">Curve</span>
+<span class="kn">from</span> <span class="nn">._helpers</span> <span class="kn">import</span> <span class="n">nafe_drake</span>
+<span class="kn">from</span> <span class="nn">._layer</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">._progress</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">._result</span> <span class="kn">import</span> <span class="n">InversionResult</span>
+
+
+<div class="viewcode-block" id="EarthModel">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel">[docs]</a>
+<span class="k">class</span> <span class="nc">EarthModel</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Layered Earth model class.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pretty model.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">()&quot;</span>
+
+        <span class="c1"># Useful variables</span>
+        <span class="n">n_layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span>
+
+        <span class="c1"># Output header</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;Earth model parameters</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Table header</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;d [km]&#39;</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="si">}{</span><span class="s1">&#39;vs [km/s]&#39;</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="si">}{</span><span class="s1">&#39;nu [-]&#39;</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;min&#39;</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}{</span><span class="s1">&#39;max&#39;</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Table</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">n_params</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">d_min</span><span class="p">,</span> <span class="n">d_max</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">thickness</span>
+            <span class="n">vs_min</span><span class="p">,</span> <span class="n">vs_max</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">velocity_s</span>
+            <span class="n">nu_min</span><span class="p">,</span> <span class="n">nu_max</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">poisson</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d_min</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">d_max</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">vs_min</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">vs_max</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">nu_min</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}{</span><span class="n">nu_max</span><span class="si">:</span><span class="s2">&gt;10.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">]</span>
+
+            <span class="n">n_params</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d_min</span> <span class="o">!=</span> <span class="n">d_max</span><span class="p">)</span>
+            <span class="n">n_params</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vs_min</span> <span class="o">!=</span> <span class="n">vs_max</span><span class="p">)</span>
+            <span class="n">n_params</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nu_min</span> <span class="o">!=</span> <span class="n">nu_max</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">60</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Misc</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Number of layers: </span><span class="si">{</span><span class="n">n_layers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Number of parameters: </span><span class="si">{</span><span class="n">n_params</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mi">80</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of layers in model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span>
+
+<div class="viewcode-block" id="EarthModel.add">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel.add">[docs]</a>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new layer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        layer : :class:`evodcinv.Layer`</span>
+<span class="sd">            Layer to add.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">Layer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="ow">and</span> <span class="n">layer</span><span class="o">.</span><span class="n">velocity_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;only the first layer can be a water layer.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EarthModel.pop">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel.pop">[docs]</a>
+    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove last layer.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`evodcinv.Layer`</span>
+<span class="sd">            Last layer.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EarthModel.configure">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel.configure">[docs]</a>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;cpso&quot;</span><span class="p">,</span>
+        <span class="n">misfit</span><span class="o">=</span><span class="s2">&quot;rmse&quot;</span><span class="p">,</span>
+        <span class="n">density</span><span class="o">=</span><span class="s2">&quot;nafe-drake&quot;</span><span class="p">,</span>
+        <span class="n">normalize_weights</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">increasing_velocity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">extra_terms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dc</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+        <span class="n">dt</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">optimizer_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure misfit function to minimize.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        optimizer : str, optional, default &#39;cpso&#39;</span>
+<span class="sd">            Type of solver. Should be one of:</span>
+
+<span class="sd">             - &#39;cmaes&#39;</span>
+<span class="sd">             - &#39;cpso&#39;</span>
+<span class="sd">             - &#39;de&#39;</span>
+<span class="sd">             - &#39;na&#39;</span>
+<span class="sd">             - &#39;pso&#39;</span>
+<span class="sd">             - &#39;vdcma&#39;</span>
+
+<span class="sd">        misfit : str or callable, optional, default &#39;rmse&#39;</span>
+<span class="sd">            Function to evaluate error. If callable, must be in the form ``f(e)``, where ``e`` is the error between observed and calculated data in the form of a 1-D array. If str, should be one of:</span>
+
+<span class="sd">             - &#39;norm1&#39;</span>
+<span class="sd">             - &#39;norm2&#39;</span>
+<span class="sd">             - &#39;rmse&#39;</span>
+
+<span class="sd">        density : str or callable, optional, default &#39;nafe-drake&#39;</span>
+<span class="sd">            Function to evaluate density. If callable, must be in the form ``f(vp)``, where ``vp`` is the P-wave velocity (in km/s). If str, should be one of:</span>
+
+<span class="sd">             - &#39;nafe-drake&#39;</span>
+
+<span class="sd">        normalize_weights : bool, optional, default True</span>
+<span class="sd">            If `True`, weights associated to individual misfit terms are normalized.</span>
+<span class="sd">        increasing_velocity : bool, optional, default True</span>
+<span class="sd">            If `True`, optimize for increasing velocity models. Note that a penalty term is added to `extra_terms`.</span>
+<span class="sd">        extra_terms : sequence of callable or None, optional, default None</span>
+<span class="sd">            Additional misfit terms. Must be a sequence of callables.</span>
+<span class="sd">        dc : scalar, optional, default 0.001</span>
+<span class="sd">            Phase velocity increment for root finding.</span>
+<span class="sd">        dt : scalar, optional, default 0.01</span>
+<span class="sd">            Frequency increment (%) for calculating group velocity.</span>
+<span class="sd">        optimizer_args : dict or None, optional, default None</span>
+<span class="sd">            A dictionary of solver options. All methods accept the following generic options:</span>
+
+<span class="sd">             - maxiter (int): maximum number of iterations to perform</span>
+<span class="sd">             - popsize (int): total population size</span>
+<span class="sd">             - seed (int or None): seed for random number generator</span>
+
+<span class="sd">            See :mod:`stochopy`&#39;s documentation for more options.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">optimizer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cmaes&quot;</span><span class="p">,</span> <span class="s2">&quot;cpso&quot;</span><span class="p">,</span> <span class="s2">&quot;de&quot;</span><span class="p">,</span> <span class="s2">&quot;na&quot;</span><span class="p">,</span> <span class="s2">&quot;pso&quot;</span><span class="p">,</span> <span class="s2">&quot;vdcma&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">misfit</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;norm1&quot;</span><span class="p">,</span> <span class="s2">&quot;norm2&quot;</span><span class="p">,</span> <span class="s2">&quot;rmse&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">misfit</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">({</span><span class="s2">&quot;nafe-drake&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">dc</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+        <span class="n">optimizer_args</span> <span class="o">=</span> <span class="n">optimizer_args</span> <span class="k">if</span> <span class="n">optimizer_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer_args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+
+        <span class="n">extra_terms</span> <span class="o">=</span> <span class="n">extra_terms</span> <span class="k">if</span> <span class="n">extra_terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_terms</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">extra_term</span> <span class="ow">in</span> <span class="n">extra_terms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">extra_term</span><span class="p">,</span> <span class="s2">&quot;__call__&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+        <span class="c1"># Misfit type</span>
+        <span class="k">if</span> <span class="n">misfit</span> <span class="o">==</span> <span class="s2">&quot;norm1&quot;</span><span class="p">:</span>
+            <span class="n">misfit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">misfit</span> <span class="o">==</span> <span class="s2">&quot;norm2&quot;</span><span class="p">:</span>
+            <span class="n">misfit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">misfit</span> <span class="o">==</span> <span class="s2">&quot;rmse&quot;</span><span class="p">:</span>
+            <span class="n">misfit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+        <span class="c1"># Density function</span>
+        <span class="k">if</span> <span class="n">density</span> <span class="o">==</span> <span class="s2">&quot;nafe-drake&quot;</span><span class="p">:</span>
+            <span class="n">density</span> <span class="o">=</span> <span class="n">nafe_drake</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span>
+            <span class="s2">&quot;misfit&quot;</span><span class="p">:</span> <span class="n">misfit</span><span class="p">,</span>
+            <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">density</span><span class="p">,</span>
+            <span class="s2">&quot;dc&quot;</span><span class="p">:</span> <span class="n">dc</span><span class="p">,</span>
+            <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+            <span class="s2">&quot;normalize_weights&quot;</span><span class="p">:</span> <span class="n">normalize_weights</span><span class="p">,</span>
+            <span class="s2">&quot;increasing_velocity&quot;</span><span class="p">:</span> <span class="n">increasing_velocity</span><span class="p">,</span>
+            <span class="s2">&quot;extra_terms&quot;</span><span class="p">:</span> <span class="n">extra_terms</span><span class="p">,</span>
+            <span class="s2">&quot;optimizer_args&quot;</span><span class="p">:</span> <span class="n">optimizer_args</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="EarthModel.invert">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel.invert">[docs]</a>
+    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">maxrun</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">split_results</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Invert model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        curves : sequence of :class:`evodcinv.Curve`</span>
+<span class="sd">            Sequence of data curves to fit.</span>
+<span class="sd">        maxrun : int, optional, default 1</span>
+<span class="sd">            Maximum number of runs. Each run starts with a different population.</span>
+<span class="sd">        split_results : bool, optional, default False</span>
+<span class="sd">            If `True`, results of the different runs are not concatenated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`evodcinv.InversionResult` or sequence of :class:`evodcinv.InversionResult`</span>
+<span class="sd">            Inversion results.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curves</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">curve</span> <span class="ow">in</span> <span class="n">curves</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span> <span class="n">Curve</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+
+        <span class="c1"># Optimizer arguments</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">]</span>
+        <span class="n">optimizer_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;optimizer_args&quot;</span><span class="p">]</span>
+
+        <span class="n">_optimizer_args</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="s2">&quot;popsize&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">_optimizer_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">optimizer_args</span><span class="p">)</span>
+
+        <span class="n">maxiter</span> <span class="o">=</span> <span class="n">_optimizer_args</span><span class="p">[</span><span class="s2">&quot;maxiter&quot;</span><span class="p">]</span>
+        <span class="n">popsize</span> <span class="o">=</span> <span class="n">_optimizer_args</span><span class="p">[</span><span class="s2">&quot;popsize&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Initial population</span>
+        <span class="k">if</span> <span class="s2">&quot;x0&quot;</span> <span class="ow">in</span> <span class="n">_optimizer_args</span><span class="p">:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">_optimizer_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Overwrite options</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cmaes&quot;</span><span class="p">:</span> <span class="s2">&quot;Penalize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cpso&quot;</span><span class="p">:</span> <span class="s2">&quot;Shrink&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;de&quot;</span><span class="p">:</span> <span class="s2">&quot;Random&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pso&quot;</span><span class="p">:</span> <span class="s2">&quot;Shrink&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vdcma&quot;</span><span class="p">:</span> <span class="s2">&quot;Penalize&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">_optimizer_args</span><span class="p">[</span><span class="s2">&quot;return_all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;na&quot;</span><span class="p">:</span>
+            <span class="n">_optimizer_args</span><span class="p">[</span><span class="s2">&quot;constraints&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constraints</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+
+        <span class="c1"># Set random seed</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">_optimizer_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># Minimize misfit function</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_misfit_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">curves</span><span class="p">)</span>
+
+        <span class="c1"># Search boundaries</span>
+        <span class="n">thickness_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">layer</span><span class="o">.</span><span class="n">thickness</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">velocity_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">layer</span><span class="o">.</span><span class="n">velocity_s</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">])</span>
+        <span class="n">poisson_bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">layer</span><span class="o">.</span><span class="n">poisson</span> <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">])</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">thickness_bounds</span><span class="p">,</span> <span class="n">velocity_bounds</span><span class="p">,</span> <span class="n">poisson_bounds</span><span class="p">])</span>
+
+        <span class="c1"># Increasing velocity models: penalty term</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;increasing_velocity&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cmaes&quot;</span><span class="p">,</span> <span class="s2">&quot;vdcma&quot;</span><span class="p">}:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Option `increasing_velocity` is not compatible yet with optimizer `</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">`.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;extra_terms&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">factory</span><span class="o">.</span><span class="n">increasing_velocity</span><span class="p">)</span>
+
+        <span class="c1"># Run maxrun inversions</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxrun</span><span class="p">):</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">maxiter</span><span class="p">))</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Increasing velocity models: initial population</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;increasing_velocity&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cmaes&quot;</span><span class="p">,</span> <span class="s2">&quot;vdcma&quot;</span><span class="p">}</span> <span class="k">else</span> <span class="n">popsize</span>
+
+                <span class="c1"># Sample thickness</span>
+                <span class="n">thicknesses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">thickness_bounds</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">thicknesses</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
+
+                <span class="c1"># Sample S-wave velocity</span>
+                <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">velocity_bounds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">top_velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">velocity_s</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">bottom_velocities</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">vs</span><span class="p">,</span> <span class="n">vmin</span><span class="p">),</span> <span class="n">vmax</span><span class="p">)</span> <span class="k">for</span> <span class="n">vs</span> <span class="ow">in</span> <span class="n">top_velocities</span>
+                <span class="p">]</span>
+                <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">vtop</span><span class="p">,</span> <span class="n">vbot</span><span class="p">])</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+                            <span class="o">*</span><span class="n">velocity_bounds</span><span class="o">.</span><span class="n">T</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">z</span><span class="p">,</span> <span class="n">vtop</span><span class="p">,</span> <span class="n">vbot</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                            <span class="n">depths</span><span class="p">,</span> <span class="n">top_velocities</span><span class="p">,</span> <span class="n">bottom_velocities</span>
+                        <span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Sample Poisson&#39;s ratio</span>
+                <span class="n">poissons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">*</span><span class="n">poisson_bounds</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">))</span>
+
+                <span class="c1"># Concatenate samples</span>
+                <span class="n">x0i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">thicknesses</span><span class="p">,</span> <span class="n">velocities</span><span class="p">,</span> <span class="n">poissons</span><span class="p">))</span>
+                <span class="n">x0i</span> <span class="o">=</span> <span class="n">x0i</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cmaes&quot;</span><span class="p">,</span> <span class="s2">&quot;vdcma&quot;</span><span class="p">}</span> <span class="k">else</span> <span class="n">x0i</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x0i</span> <span class="o">=</span> <span class="n">x0</span>
+
+            <span class="k">with</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">maxiter</span><span class="p">)</span> <span class="k">as</span> <span class="n">bar</span><span class="p">:</span>
+
+                <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">res</span><span class="p">):</span>
+                    <span class="n">bar</span><span class="o">.</span><span class="n">misfit</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">fun</span> <span class="o">&gt;=</span> <span class="mf">1.0e-4</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">bar</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+                <span class="n">x</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span>
+                    <span class="n">func</span><span class="p">,</span>
+                    <span class="n">bounds</span><span class="p">,</span>
+                    <span class="n">x0</span><span class="o">=</span><span class="n">x0i</span><span class="p">,</span>
+                    <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                    <span class="n">options</span><span class="o">=</span><span class="n">_optimizer_args</span><span class="p">,</span>
+                    <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Parse output</span>
+            <span class="n">popsize</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">xall</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">velocity_models</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">popsize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">nit</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">popsize</span><span class="p">):</span>
+                    <span class="n">velocity_models</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">xall</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">InversionResult</span><span class="p">(</span>
+                <span class="n">xs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">xall</span><span class="p">),</span>
+                <span class="n">models</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">velocity_models</span><span class="p">),</span>
+                <span class="n">misfits</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">funall</span><span class="p">),</span>
+                <span class="n">global_misfits</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="o">.</span><span class="n">accumulate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">funall</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">maxiter</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span>
+                <span class="n">popsize</span><span class="o">=</span><span class="n">popsize</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">split_results</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">results</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">InversionResult</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">result</span>
+
+            <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="EarthModel.transform">
+<a class="viewcode-back" href="../../api/model.html#evodcinv.EarthModel.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform model parameters to velocity model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : array_like</span>
+<span class="sd">            Model parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        array_like</span>
+<span class="sd">            Velocity model with shape (n_layers, 4).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">thickness</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">velocity_s</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">poisson</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">velocity_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_velocity_p</span><span class="p">(</span><span class="n">velocity_s</span><span class="p">,</span> <span class="n">poisson</span><span class="p">)</span>
+        <span class="n">density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_density</span><span class="p">(</span><span class="n">velocity_p</span><span class="p">)</span>
+
+        <span class="c1"># Handle water layer</span>
+        <span class="k">if</span> <span class="n">velocity_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">velocity_p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">velocity_s</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">velocity_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.5</span>
+            <span class="n">velocity_s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">density</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thickness</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="n">velocity_p</span><span class="p">,</span> <span class="n">velocity_s</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_misfit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">curves</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Misfit function to minimize.&quot;&quot;&quot;</span>
+        <span class="n">thickness</span><span class="p">,</span> <span class="n">velocity_p</span><span class="p">,</span> <span class="n">velocity_s</span><span class="p">,</span> <span class="n">density</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">misfit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;misfit&quot;</span><span class="p">]</span>
+        <span class="n">normalize_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;normalize_weights&quot;</span><span class="p">]</span>
+        <span class="n">extra_terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;extra_terms&quot;</span><span class="p">]</span>
+        <span class="n">dc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;dc&quot;</span><span class="p">]</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span>
+
+        <span class="n">error_extra</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_terms</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">extra_term</span> <span class="ow">in</span> <span class="n">extra_terms</span><span class="p">:</span>
+                <span class="n">error_extra</span> <span class="o">+=</span> <span class="n">extra_term</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">error_extra</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">weights_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">curve</span> <span class="ow">in</span> <span class="n">curves</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">curve</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;ellipticity&quot;</span><span class="p">:</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">surf96</span><span class="p">(</span>
+                        <span class="n">curve</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+                        <span class="n">thickness</span><span class="p">,</span>
+                        <span class="n">velocity_p</span><span class="p">,</span>
+                        <span class="n">velocity_s</span><span class="p">,</span>
+                        <span class="n">density</span><span class="p">,</span>
+                        <span class="n">curve</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+                        <span class="n">itype</span><span class="p">[</span><span class="n">curve</span><span class="o">.</span><span class="n">type</span><span class="p">],</span>
+                        <span class="n">ifunc</span><span class="p">[</span><span class="s2">&quot;dunkin&quot;</span><span class="p">][</span><span class="n">curve</span><span class="o">.</span><span class="n">wave</span><span class="p">],</span>
+                        <span class="n">dc</span><span class="p">,</span>
+                        <span class="n">dt</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+                    <span class="n">dcalc</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ell</span> <span class="o">=</span> <span class="n">Ellipticity</span><span class="p">(</span>
+                        <span class="n">thickness</span><span class="p">,</span>
+                        <span class="n">velocity_p</span><span class="p">,</span>
+                        <span class="n">velocity_s</span><span class="p">,</span>
+                        <span class="n">density</span><span class="p">,</span>
+                        <span class="n">dc</span><span class="o">=</span><span class="n">dc</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">rel</span> <span class="o">=</span> <span class="n">ell</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">curve</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+                    <span class="n">dcalc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rel</span><span class="o">.</span><span class="n">ellipticity</span><span class="p">)</span>
+
+                <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dcalc</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">curve</span><span class="o">.</span><span class="n">uncertainties</span> <span class="k">if</span> <span class="n">curve</span><span class="o">.</span><span class="n">uncertainties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">1.0</span>
+                    <span class="p">)</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">sigma</span>
+                    <span class="n">error</span> <span class="o">+=</span> <span class="n">curve</span><span class="o">.</span><span class="n">weight</span> <span class="o">*</span> <span class="n">misfit</span><span class="p">((</span><span class="n">dcalc</span> <span class="o">-</span> <span class="n">curve</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">sigma</span><span class="p">)</span>
+                    <span class="n">weights_sum</span> <span class="o">+=</span> <span class="n">curve</span><span class="o">.</span><span class="n">weight</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+
+            <span class="k">except</span> <span class="n">DispersionError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+
+        <span class="k">if</span> <span class="n">normalize_weights</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">/=</span> <span class="n">weights_sum</span>
+
+        <span class="k">return</span> <span class="n">error</span> <span class="o">+</span> <span class="n">error_extra</span>
+
+    <span class="k">def</span> <span class="nf">_get_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity_p</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get density for each layer.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_configuration</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">](</span><span class="n">vp</span><span class="p">)</span> <span class="k">for</span> <span class="n">vp</span> <span class="ow">in</span> <span class="n">velocity_p</span><span class="p">])</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;model is not configured&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_velocity_p</span><span class="p">(</span><span class="n">velocity_s</span><span class="p">,</span> <span class="n">poisson</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get P-wave velocity.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">velocity_s</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">poisson</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">-</span> <span class="n">poisson</span><span class="p">))</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">layers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return layers in model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layers</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of layers.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layers</span><span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2021, Keurfon Luu.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
