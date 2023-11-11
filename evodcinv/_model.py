@@ -79,6 +79,9 @@ class EarthModel:
         if not isinstance(layer, Layer):
             raise TypeError()
 
+        if self.n_layers and layer.velocity_s[0] <= 0.0:
+            raise ValueError("only the first layer can be a water layer.")
+
         self.layers.append(layer)
 
     def pop(self):
@@ -396,16 +399,10 @@ class EarthModel:
         density = self._get_density(velocity_p)
 
         # Handle water layer
-        cond = np.flatnonzero(velocity_s <= 0.0)
-
-        if cond.size:
-            if cond[0] != 0 or cond.size != 1:
-                raise ValueError("only the first layer can be a water layer.")
-
-            else:
-                velocity_p[0] = abs(velocity_s[0]) if velocity_s[0] < 0.0 else 1.5
-                velocity_s[0] = 0.0
-                density[0] = 1.0
+        if velocity_s[0] <= 0.0:
+            velocity_p[0] = abs(velocity_s[0]) if velocity_s[0] < 0.0 else 1.5
+            velocity_s[0] = 0.0
+            density[0] = 1.0
 
         return np.column_stack(
             (np.append(thickness, 1.0), velocity_p, velocity_s, density)
